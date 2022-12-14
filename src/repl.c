@@ -77,7 +77,7 @@ static char *text_prompt(const uint32_t line_number) {
 	printf("%d:*", line_number);
 
 	if((read_line = get_line(stdin)) == NULL) {
-		print_error(RET_ERR_MALLOC, "edlin");
+		print_error(RET_ERR_MALLOC);
 		return NULL;
 	}
 
@@ -99,7 +99,7 @@ static int append(repl_state_t *state, ed_doc_t *document, edps_instr_t *instr) 
 	if((instr->start_line != EDPS_NO_LINE) ||
 	   (instr->end_line != EDPS_NO_LINE) ||
 	   (instr->only_line == EDPS_THIS_LINE))
-		return print_error(RET_ERR_INVALID, "edlin");
+		return print_error(RET_ERR_INVALID);
 
 	if(instr->only_line != EDPS_NO_LINE) {
 		/* The parser returns a zero indexed line
@@ -139,10 +139,10 @@ static int copy(repl_state_t *state, ed_doc_t *document, edps_instr_t *instr) {
 	if(instr->target_line == EDPS_THIS_LINE) target = state->cursor;
 
 	if(start > end)
-		return print_error(RET_ERR_RANGE, "edlin");
+		return print_error(RET_ERR_RANGE);
 
 	if((target > start) && (target <= end))
-		return print_error(RET_ERR_RANGE, "edlin");
+		return print_error(RET_ERR_RANGE);
 
 	copy_size = end - start + 1;
 	if(target <= start) skip = 2;
@@ -191,7 +191,7 @@ static int end(repl_state_t *state, ed_doc_t *document, edps_instr_t *instr) {
 	if((status = save_doc(document, NULL, 0, document->n_lines)) == RET_OK) {
 		state->quit = 1;
 	} else {
-		print_error(status, "edlin");
+		print_error(status);
 	}
 
 	return status;
@@ -202,15 +202,15 @@ static int edit(repl_state_t *state, ed_doc_t *document, edps_instr_t *instr) {
 	char **line_str, *new_line;
 
 	if(n_line == EDPS_NO_LINE)
-		return print_error(RET_ERR_SYNTAX, "edlin");
+		return print_error(RET_ERR_SYNTAX);
 
 	if(n_line > document->n_lines - 1)
-		return print_error(RET_ERR_INVALID, "edlin");
+		return print_error(RET_ERR_INVALID);
 
 	state->cursor = n_line;
 
 	if((line_str = dynarr_get_element(document->lines_arr, n_line)) == NULL)
-		return print_error(RET_ERR_NULLPO, "edlin");;
+		return print_error(RET_ERR_NULLPO);;
 
 	indent(n_line + 1);
 	printf("%ld:*%s\n", n_line + 1, *line_str);
@@ -230,7 +230,7 @@ static int insert(repl_state_t *state, ed_doc_t *document, edps_instr_t *instr) 
 	int status, goon = 1;
 
 	if((instr->start_line != EDPS_NO_LINE) || (instr->end_line != EDPS_NO_LINE)) {
-		return print_error(RET_ERR_RANGE, "edlin");
+		return print_error(RET_ERR_RANGE);
 	}
 
 	if((instr->only_line == EDPS_NO_LINE) || (instr->only_line == EDPS_THIS_LINE))
@@ -244,7 +244,7 @@ static int insert(repl_state_t *state, ed_doc_t *document, edps_instr_t *instr) 
 			goon = 0;
 		} else {
 			if((status = dynarr_insert(document->lines_arr, &read_line, l)) != RET_OK) {
-				print_error(status, "edlin");
+				print_error(status);
 				free(read_line);
 				return status;
 			} else {
@@ -360,7 +360,7 @@ static int move(repl_state_t *state, ed_doc_t *document, edps_instr_t *instr) {
 	if(instr->end_line == EDPS_THIS_LINE) end = state->cursor;
 
 	if((target >= start) && (target <= end))
-		return print_error(RET_ERR_RANGE, "edlin");
+		return print_error(RET_ERR_RANGE);
 
 	move_range = end - start + 1;
 
@@ -369,7 +369,7 @@ static int move(repl_state_t *state, ed_doc_t *document, edps_instr_t *instr) {
 
 	state->cursor = target;
 	if((status = dynarr_move(document->lines_arr, start, end, target)) != RET_OK)
-		return print_error(status, "edlin");
+		return print_error(status);
 
 	return RET_OK;
 }
@@ -510,7 +510,7 @@ static int replace(repl_state_t *state, ed_doc_t *document, edps_instr_t *instr)
 	}
 
 	if((instr->replace_str == NULL) || (strlen(instr->replace_str) == 0))
-		return print_error(RET_ERR_SYNTAX, "edlin");
+		return print_error(RET_ERR_SYNTAX);
 
 	if(state->search_str == NULL) {
 		/* Nothing searched before.        */
@@ -669,7 +669,7 @@ static int transfer(repl_state_t *state, ed_doc_t *document, edps_instr_t *instr
 	int status;
 	
 	if((instr->start_line != EDPS_NO_LINE) || (instr->end_line != EDPS_NO_LINE)) {
-		return print_error(RET_ERR_RANGE, "edlin");
+		return print_error(RET_ERR_RANGE);
 	}
 	if(instr->only_line == EDPS_NO_LINE) {
 		insert_line = state->cursor;
@@ -678,11 +678,11 @@ static int transfer(repl_state_t *state, ed_doc_t *document, edps_instr_t *instr
 	}
 
 	if((fp = fopen(instr->filename, "r")) == NULL)
-		return print_error(RET_ERR_OPEN, "edlin");
+		return print_error(RET_ERR_OPEN);
 
 	if((new_doc = load_doc(fp, NULL)) == NULL) {
 		fclose(fp);
-		return print_error(RET_ERR_READ, "edlin");
+		return print_error(RET_ERR_READ);
 	}
 
 	fclose(fp);
@@ -709,7 +709,7 @@ static int write(repl_state_t *state, ed_doc_t *document, edps_instr_t *instr) {
 	char *filename;
 
 	if((instr->start_line != EDPS_NO_LINE) || (instr->end_line != EDPS_NO_LINE))
-		return print_error(RET_ERR_RANGE, "edlin");
+		return print_error(RET_ERR_RANGE);
 
 	if(instr->only_line == EDPS_NO_LINE)
 		end_line = document->n_lines;
@@ -744,14 +744,14 @@ int save_doc(ed_doc_t *doc, const char *filename, const uint32_t start_line, con
 	char CHECK_CHAR;
 
 	if(doc == NULL)
-		return print_error(RET_ERR_INVALID, "edlin");
+		return print_error(RET_ERR_INVALID);
 
 	if(out_filename == NULL)
 		if((out_filename = doc->filename) == NULL)
-			return print_error(RET_ERR_INVALID, "edlin");
+			return print_error(RET_ERR_INVALID);
 
 	if((fp = fopen(out_filename, "w")) == NULL)
-		return print_error(RET_ERR_OPEN, "edlin");
+		return print_error(RET_ERR_OPEN);
 
 	n_lines = dynarr_get_size(doc->lines_arr);
 	for(curr_line = 0; curr_line < n_lines; curr_line++) {
@@ -874,12 +874,12 @@ int repl_main(FILE *input, ed_doc_t *ed_doc, const char *prompt) {
 			if((parser_status = edps_parse(parser_ctx)) != RET_OK) {
 				switch(parser_status) {
 					case RET_ERR_SYNTAX:
-						print_error(parser_status, "edlin");
+						print_error(parser_status);
 						continue;
 
 					case RET_ERR_INTERNAL:
 					case RET_ERR_MALLOC:
-						return print_error(parser_status, "edlin");
+						return print_error(parser_status);
 						return status;
 				}
 			}

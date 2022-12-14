@@ -10,6 +10,7 @@
 
 #include <stdlib.h>
 
+#include "appinfo.h"
 #include "ermac.h"
 #include "util.h"
 
@@ -58,7 +59,7 @@ char *str_error(const int err_no) {
 int print_error(const int err_no) {
 	char *errstr = str_error(err_no);
 
-	fprintf(stderr, "%s: ");
+	fprintf(stderr, "%s: ", APP_NAME);
 
 	if(errstr) {
 		fprintf(stderr, "%s.\n", errstr);
