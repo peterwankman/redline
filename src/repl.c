@@ -23,8 +23,7 @@ typedef struct repl_state_t {
 } repl_state_t;
 
 static void indent(const uint32_t n) {
-	size_t l = num_len(n);
-	size_t i;
+	uint32_t i, l = num_len(n);
 
 	for(i = 0; i < 8 - l; i++)
 		printf(" ");
