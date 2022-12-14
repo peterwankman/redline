@@ -864,7 +864,7 @@ static int ps_transfer(edps_ctx_t *ctx) {
 
 static int ps_write(edps_ctx_t *ctx) {
 	edlx_token_t token;
-	char *lexeme, lookahead;
+	char *lexeme;
 	int status;
 
 #ifdef CHATTY_PARSER

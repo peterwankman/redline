@@ -17,12 +17,12 @@
 #define PREALLOC_LINES		16
 
 typedef struct repl_state_t {
-	int cursor;
+	uint32_t cursor;
 	int quit;
 	char *search_str;
 } repl_state_t;
 
-static void indent(const int n) {
+static void indent(const uint32_t n) {
 	size_t l = num_len(n);
 	size_t i;
 
@@ -198,15 +198,16 @@ static int end(repl_state_t *state, ed_doc_t *document, edps_instr_t *instr) {
 }
 
 static int edit(repl_state_t *state, ed_doc_t *document, edps_instr_t *instr) {
-	size_t n_line = instr->only_line;
+	uint32_t n_line;
 	char **line_str, *new_line;
 
-	if(n_line == EDPS_NO_LINE)
+	if(instr->only_line == EDPS_NO_LINE)
 		return print_error(RET_ERR_SYNTAX);
 
-	if(n_line > document->n_lines - 1)
+	if(instr->only_line > document->n_lines - 1)
 		return print_error(RET_ERR_INVALID);
 
+	n_line = instr->only_line;
 	state->cursor = n_line;
 
 	if((line_str = dynarr_get_element(document->lines_arr, n_line)) == NULL)
@@ -259,9 +260,9 @@ static int insert(repl_state_t *state, ed_doc_t *document, edps_instr_t *instr) 
 
 static int list(repl_state_t *state, ed_doc_t *document, edps_instr_t *instr) {
 	uint32_t start = instr->start_line, end = instr->end_line;
+	uint32_t i, lines_shown = 0;
 	char **line;
-	size_t i;
-	uint32_t lines_shown = 0;
+
 
 	/* L command behaviour:
 	 * No arguments:
@@ -353,7 +354,7 @@ static int move(repl_state_t *state, ed_doc_t *document, edps_instr_t *instr) {
 	uint32_t start = instr->start_line;
 	uint32_t end = instr->end_line;
 	uint32_t target = instr->target_line;
-	size_t move_range;
+	uint32_t move_range;
 	int status;
 
 	if(instr->start_line == EDPS_THIS_LINE) start = state->cursor;
@@ -376,9 +377,8 @@ static int move(repl_state_t *state, ed_doc_t *document, edps_instr_t *instr) {
 
 static int page(repl_state_t *state, ed_doc_t *document, edps_instr_t *instr) {
 	uint32_t start = instr->start_line, end = instr->end_line;
+	uint32_t i, lines_shown = 0;
 	char **line;
-	size_t i;
-	uint32_t lines_shown = 0;
 
 	/* P command behaviour:
 	*
@@ -489,9 +489,9 @@ static char *construct_replace(const char *str, const char *search, const char *
 
 static int replace(repl_state_t *state, ed_doc_t *document, edps_instr_t *instr) {
 	uint32_t start = instr->start_line, end = instr->end_line;
+	uint32_t i;
 	char **line;
-	size_t i, match_pos = 0;
-	int match_status;
+	size_t match_pos = 0;
 	char *edited_str;
 	int found = 0;
 
@@ -598,8 +598,8 @@ static int replace(repl_state_t *state, ed_doc_t *document, edps_instr_t *instr)
 
 static int search(repl_state_t *state, ed_doc_t *document, edps_instr_t *instr) {
 	uint32_t start = instr->start_line, end = instr->end_line;
+	uint32_t i;
 	char **line;
-	size_t i;
 
 	start = instr->start_line;
 	if(instr->start_line == EDPS_THIS_LINE) start = state->cursor;
@@ -722,6 +722,7 @@ static int write(repl_state_t *state, ed_doc_t *document, edps_instr_t *instr) {
 		filename = document->filename;
 
 	save_doc(document, filename, 0, end_line);
+	return RET_OK;
 }
 
 /*/*/
@@ -740,8 +741,6 @@ int save_doc(ed_doc_t *doc, const char *filename, const uint32_t start_line, con
 	size_t pos, bytes_written, to_write;
 	int fix_line = 0;
 	char **line_data;
-
-	char CHECK_CHAR;
 
 	if(doc == NULL)
 		return print_error(RET_ERR_INVALID);
