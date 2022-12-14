@@ -4,10 +4,10 @@
  *****************************************/
 
 #include <ctype.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <time.h>
 
 #include "ermac.h"
 
@@ -135,18 +135,14 @@ int is_positive_integer(const char *str) {
 	return 1;
 }
 
-size_t num_len(int i) {
-	size_t out = 0;
+uint32_t num_len(int i) {
+	uint32_t out = 0;
 	while(i) {
 		i /= 10;
 		out++;
 	}
 
 	return out;
-}
-
-size_t estimate_lines(const size_t file_size) {
-	return file_size / 80;
 }
 
 /* ctype character classification without the crashing */
@@ -168,148 +164,3 @@ def_ext_ctype(ispunct);
 def_ext_ctype(isspace);
 def_ext_ctype(isupper);
 def_ext_ctype(isxdigit);
-
-/**/
-
-/* Grab 2 digits from somewhere in the string. */
-static int get_number(const char *datestr, const size_t pos, const int max) {
-	int a, b, out;
-
-	if(pos >= strlen(datestr)) {
-		fprintf(stderr, "get_number('%s'[%ld], %ld): Invalid position.\n",
-			datestr, strlen(datestr), pos);
-		return -1;
-	}
-	a = datestr[pos + 0];
-	b = datestr[pos + 1];
-
-	if(!(isdigit(a) && isdigit(b))) {
-		fprintf(stderr, "get_number('%s', %ld): Invalid argument.\n",
-			datestr, pos);
-		return -1;
-	}
-
-	out = (a - '0') * 10 + b - '0';
-	if(out > max) return -1;
-	return out;
-}
-// [[CC]YY]MMDDhhmm[.ss]
-
-static int month_length[13] = {
-	0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31
-};
-
-static int check_date(const int day, const int month, const int year) {
-	int month_days;
-	int leap_year = 0;
-
-	/* Year 0 is a lie made up by flat earthers! */
-	if((day < 1) || (month < 1) || (month > 12) || (year == 0))
-		return -1;
-
-	month_days = month_length[month];
-
-	if(month == 2) {
-		if((year % 4) != 0) {
-			leap_year = 0;
-		} else if((year % 100) != 0) {
-			leap_year = 1;
-		} else if((year % 400) != 0) {
-			leap_year = 0;
-		} else {
-			leap_year = 1;
-		}
-	}
-	
-	if(day > month_days + leap_year) return -1;
-
-	return 1;
-}
-
-struct tm parse_tm(const char *datestr, int *status) {
-	int century = -1, year = -1, month = -1, day = -1;
-	int hour = -1, minute = -1, second = -1;
-	size_t datelen;
-	struct tm out = { 0 };
-	const char *dotpos, *seekpos = datestr;
-
-	if((datestr == NULL) || (status == NULL)) {
-		fprintf(stderr, "parse_date(): Invalid argument.\n");
-		goto fail;
-	}
-	*status = 0;
-
-	if((dotpos = strchr(datestr, '.')) == NULL) {
-		second = 0;
-		datelen = strlen(datestr);
-	} else {
-		/* Seconds can be over 59 because leap seconds exist. */
-		if((second = get_number(dotpos, 1, 60)) == -1) {
-			fprintf(stderr, "parse_date(): Invalid number of seconds.\n");
-			goto fail;
-		}
-		datelen = dotpos - datestr;
-	}
-
-	if(datelen < 8) {
-		fprintf(stderr, "parse_date(): Date string too short.");
-		goto fail;
-	}
-
-	year = 0;
-	switch(datelen) {
-		case 12:
-			if((century = get_number(seekpos, 0, 99)) == -1) {
-				fprintf(stderr, "parse_date(): Invalid century.\n");
-				goto fail;
-			}
-			seekpos += 2;
-
-		case 10:
-			if((year = get_number(seekpos, 0, 99)) == -1) {
-				fprintf(stderr, "parse_date(): Invalid year.\n");
-				goto fail;
-			}
-			seekpos += 2;
-
-		case 8:
-			month = get_number(seekpos, 0, 12);
-			day = get_number(seekpos, 2, 31);
-			hour = get_number(seekpos, 4, 23);
-			minute = get_number(seekpos, 6, 59);
-			break;
-	}
-
-	if(century == -1) {
-		if(year < 69)
-			century = 20;
-		else
-			century = 19;
-	}
-	year += century * 100;
-
-	if(check_date(day, month, year) != 1) {
-		fprintf(stderr, "parse_date(): Not a real date!\n");
-		goto fail;
-	}
-
-	out.tm_year = year - 1900;
-	out.tm_mon = month - 1;
-	out.tm_mday = day;
-	out.tm_hour = hour;
-	out.tm_min = minute;
-	out.tm_sec = second;
-
-	*status = 1;
-fail:
-	return out;
-}
-
-time_t parse_time(const char *datestr, int *status) {
-	struct tm stm;
-
-	stm = parse_tm(datestr, status);
-	if(status == 0)	return 0;
-
-	return mktime(&stm);
-}
