@@ -214,7 +214,7 @@ static int edit(repl_state_t *state, ed_doc_t *document, edps_instr_t *instr) {
 		return print_error(RET_ERR_NULLPO);;
 
 	indent(n_line + 1);
-	printf("%ld:*%s\n", n_line + 1, *line_str);
+	printf("%d:*%s\n", n_line + 1, *line_str);
 	if((is_empty(new_line = text_prompt(n_line + 1))) == RET_NO) {
 		dynarr_insert(document->lines_arr, &new_line, n_line + 1);
 		dynarr_delete(document->lines_arr, n_line, n_line);
@@ -332,7 +332,7 @@ static int list(repl_state_t *state, ed_doc_t *document, edps_instr_t *instr) {
 	for(i = start; i < end + 1; i++) {
 		line = dynarr_get_element(document->lines_arr, i);
 		indent(i + 1);
-		printf("%ld:", i + 1);
+		printf("%d:", i + 1);
 		if(i == state->cursor)
 			printf("*");
 		else
@@ -439,7 +439,7 @@ static int page(repl_state_t *state, ed_doc_t *document, edps_instr_t *instr) {
 	for(i = start; i < end + 1; i++) {
 		line = dynarr_get_element(document->lines_arr, i);
 		indent(i + 1);
-		printf("%ld:", i + 1);
+		printf("%d:", i + 1);
 		if(i == end)
 			printf("*");
 		else
@@ -542,7 +542,7 @@ static int replace(repl_state_t *state, ed_doc_t *document, edps_instr_t *instr)
 			if((edited_str = construct_replace(*line, state->search_str, instr->replace_str, &match_pos)) != NULL) {
 				found = 1;
 				indent(i + 1);
-				printf("%ld: %s\n", i + 1, edited_str);
+				printf("%d: %s\n", i + 1, edited_str);
 
 				if(instr->ask == RET_YES) {
 					if(ask("O.K.", stdin) == RET_YES) {
@@ -561,33 +561,6 @@ static int replace(repl_state_t *state, ed_doc_t *document, edps_instr_t *instr)
 		} while(edited_str != NULL);
 		state->cursor = i;
 
-/*
-		if(strstr(*line, state->search_str)) {
-			found = 1;
-			match_pos = 0;
-			do {
-				if((edited_str = construct_replace(*line, state->search_str, instr->replace_str, &match_pos)) != NULL) {
-					indent(i + 1);
-					printf("%ld: %s\n", i + 1, edited_str);
-
-					if(instr->ask == RET_YES) {
-						if(ask("O.K.", stdin) == RET_YES) {
-							free(*line);
-							*line = edited_str;
-							match_pos += strlen(instr->replace_str);
-						} else {
-							match_pos += strlen(state->search_str);
-						}
-					} else {
-						free(*line);
-						*line = edited_str;
-						match_pos += strlen(instr->replace_str);
-					}
-				}
-			} while(edited_str != NULL);
-			state->cursor = i;
-		}
-*/
 	}
 
 	if(found == 0)
@@ -641,7 +614,7 @@ static int search(repl_state_t *state, ed_doc_t *document, edps_instr_t *instr) 
 		line = dynarr_get_element(document->lines_arr, i);
 		if(strstr(*line, state->search_str)) {
 			indent(i + 1);
-			printf("%ld: %s\n", i + 1, *line);
+			printf("%d: %s\n", i + 1, *line);
 
 			state->cursor = i;
 
