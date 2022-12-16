@@ -24,116 +24,116 @@ to the line with the cursor by using a period as the line to use. For example
 COMMANDS:
 =========
 
-?:	Manual
+?:Manual
 ----------
-	* Arguments: none
+* Usage: ```?```
 
-	Gives a brief description of all commands.
+Gives a brief description of all commands.
 
-<line>: Edit line.
+[line]: Edit line.
 ------------------
-	* Arguments: none
+* Usage: ```[line]```
 
-	Prompts you to enter a single line, which will replace the one given.
+Prompts you to enter a single line, which will replace the one given.
 
 A: Append
 ---------
-	* Arguments: <lines>A
+* Usage: ```[lines]A```
 
-	This command is a complete mystery to me. I can't make EDLIN do anything
-	other than reply "End of input file", whatever I try to feed it. I took
-	that as an invitation to be creative and I found it obvious to let you
-	append text at the end of the file. Using the optional argument will let
-	you enter that number of lines before going back to the prompt. Without
-	any argument, end the input as described above.
+This command is a complete mystery to me. I can't make EDLIN do anything
+other than reply "End of input file", whatever I try to feed it. I took
+that as an invitation to be creative and I found it obvious to let you
+append text at the end of the file. Using the optional argument will let
+you enter that number of lines before going back to the prompt. Without
+any argument, end the input as described above.
 
 C: Copy
 -------
-	* Arguments: <start>,<end>,target<,repetitions>C
+* Usage: ```[start],[end],target[,repetitions]C```
 
-	Copy a line or block of text to another place in the file, optionally
-	repeating it multiple times. The first line of the copied text will end up
-	at the target line.
+Copy a line or block of text to another place in the file, optionally
+repeating it multiple times. The first line of the copied text will end up
+at the target line.
 
 D: Delete
 ---------
-	* Arguments: <start><,end>D
+* Usage: ```[start][,end]D```
 
-	Like it says. Delete a line or block of text.
+Like it says. Delete a line or block of text.
 
-E:	End
+E:End
 -------
-	* Arguments: none
+* Usage: ```E```
 
-	Saves the file and exits.
+Saves the file and exits.
 
-I:	Insert
+I:Insert
 ----------
-	*Arguments: <line>I
+* Usage: ```[line]I```
 
-	Lets you enter a block of text, the first line entered being inserted in
-	place of the number given as the argument.
+Lets you enter a block of text, the first line entered being inserted in
+place of the number given as the argument.
 
-L:	List
+L:List
 --------
-	*Arguments: <start><,end>L
+* Usage: ```[start][,end]L```
 
-	Lists the file from start to end. When given no argument, it will begin
-	listing 11 lines before the cursor. After a full page of 24 lines has been
-	printed, it will ask you if you want to continue.
+Lists the file from start to end. When given no argument, it will begin
+listing 11 lines before the cursor. After a full page of 24 lines has been
+printed, it will ask you if you want to continue.
 
-M:	Move
+M:Move
 --------
-	* Arguments: <start>,<end>,target
+* Usage: ```[start],[end],target```
 
-	Cuts a block of text and pastes it at the target line. The first line of the
-	block will end up on the target line.
+Cuts a block of text and pastes it at the target line. The first line of the
+block will end up on the target line.
 
-P:	Page
+P:Page
 --------
-	* Arguments: <start><,end>P
+* Usage: ```[start][,end]P```
 
-	Behaves like L, but will start at the cursor instead of 11 lines before.
+Behaves like L, but will start at the cursor instead of 11 lines before.
 
-Q:	Quit
+Q:Quit
 --------
-	* Arguments: none
+* Usage: ```Q```
 
-	Exit without saving changes.
+Exit without saving changes.
 
-R:	Search and replace
+R:Search and replace
 ----------------------
-	* Arguments: <start><,end><?>R<search>,<replace>
+* Usage: ```[start][,end][?]R[search],[replace]```
 
-	Replaces all instances of the search string within the range of lines with
-	the given replacement string. With the question mark in the command, it
-	will display the change that will be made and prompt you to confirm before
-	actually making the change.
+Replaces all instances of the search string within the range of lines with
+the given replacement string. With the question mark in the command, it
+will display the change that will be made and prompt you to confirm before
+actually making the change.
 
-S:	Search
+S:Search
 ----------
-	* Arguments: <start><,end><?>S<search>
+* Usage: ```[start][,end][?]S[search]```
 
-	Puts the cursor at line with the first occurrence of the search string.
-	With the question mark in the command, it will prompt you whether to
-	end the search or to continue.
-	After an initial search, the command can be used again without giving a
-	new search string, to continue the last search operation. The previous
-	range to search in will be discarded for the new one (that means, if you
-	don't give a range, it will search from the cursor to the end of the
-	file.)
+Puts the cursor at line with the first occurrence of the search string.
+With the question mark in the command, it will prompt you whether to
+end the search or to continue.
+After an initial search, the command can be used again without giving a
+new search string, to continue the last search operation. The previous
+range to search in will be discarded for the new one (that means, if you
+don't give a range, it will search from the cursor to the end of the
+file.)
 
-T:	Transfer
+T:Transfer
 ------------
-	* Arguments: <target>T<filename> 
+* Usage: ```[target]T[filename]```
 
-	This will load the given file and place its contents in the document at
-	the given line number. The first line of the file will be pasted to the
-	given target line.
+This will load the given file and place its contents in the document at
+the given line number. The first line of the file will be pasted to the
+given target line.
 
-W:	Write
+W:Write
 --------- 
-	* Arguments: <lines>W
+* Usage: ```[lines]W```
 
-	Saves the file from the beginning of the buffer to the given line. Without
-	argument, the whole buffer will be written to disk.
+Saves the file from the beginning of the buffer to the given line. Without
+argument, the whole buffer will be written to disk.
