@@ -93,7 +93,9 @@ P:Page
 --------
 * Usage: ```[start][,end]P```
 
-Behaves like L, but will start at the cursor instead of 11 lines before.
+Listing behaves like L, but will start at the cursor instead of 11 lines
+before. P will set the cursor to the last displayed line. Running P again
+or on its own will continue from the line after the cursor.
 
 Q:Quit
 --------
