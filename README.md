@@ -38,8 +38,8 @@ created when ending the session or explicitely saving.
 COMMANDS:
 =========
 
-?:Manual
-----------
+?: Manual
+---------
 * Usage: ```?```
 
 Gives a brief description of all commands.
@@ -75,50 +75,50 @@ D: Delete
 
 Like it says. Delete a line or block of text.
 
-E:End
--------
+E: End
+------
 * Usage: ```E```
 
 Saves the file and exits.
 
-I:Insert
-----------
+I: Insert
+---------
 * Usage: ```[line]I```
 
 Lets you enter a block of text, the first line entered being inserted in
 place of the number given as the argument.
 
-L:List
---------
+L: List
+-------
 * Usage: ```[start][,end]L```
 
 Lists the file from start to end. When given no argument, it will begin
 listing 11 lines before the cursor. After a full page of 24 lines has been
 printed, it will ask you if you want to continue.
 
-M:Move
---------
+M: Move
+-------
 * Usage: ```[start],[end],target```
 
 Cuts a block of text and pastes it at the target line. The first line of the
 block will end up on the target line.
 
-P:Page
---------
+P: Page
+-------
 * Usage: ```[start][,end]P```
 
 Listing behaves like L, but will start at the cursor instead of 11 lines
 before. P will set the cursor to the last displayed line. Running P again
 or on its own will continue from the line after the cursor.
 
-Q:Quit
---------
+Q: Quit
+-------
 * Usage: ```Q```
 
 Exit without saving changes.
 
-R:Search and replace
-----------------------
+R: Search and replace
+---------------------
 * Usage: ```[start][,end][?]R[search],[replace]```
 
 Replaces all instances of the search string within the range of lines with
@@ -126,8 +126,8 @@ the given replacement string. With the question mark in the command, it
 will display the change that will be made and prompt you to confirm before
 actually making the change.
 
-S:Search
-----------
+S: Search
+---------
 * Usage: ```[start][,end][?]S[search]```
 
 Puts the cursor at line with the first occurrence of the search string.
@@ -139,16 +139,16 @@ range to search in will be discarded for the new one (that means, if you
 don't give a range, it will search from the cursor to the end of the
 file.)
 
-T:Transfer
-------------
+T: Transfer
+-----------
 * Usage: ```[target]T[filename]```
 
 This will load the given file and place its contents in the document at
 the given line number. The first line of the file will be pasted to the
 given target line.
 
-W:Write
---------- 
+W: Write
+--------
 * Usage: ```[lines]W[filename]```
 
 Saves the file from the beginning of the buffer to the given line. Without
