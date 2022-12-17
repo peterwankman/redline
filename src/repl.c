@@ -900,7 +900,7 @@ int repl_main(FILE *input, ed_doc_t *ed_doc, const char *prompt, const char *cur
 		printf("%s", repl_state->prompt);
 		cmdline = get_line(input);
 
-		if((parser_ctx = edps_new(cmdline, &status)) == NULL) {
+		if((parser_ctx = edps_new(cmdline, prompt, &status)) == NULL) {
 			fprintf(stderr, "edlin: Parser initialization failed.\n");
 			continue;
 		}
