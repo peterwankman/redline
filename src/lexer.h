@@ -54,6 +54,6 @@ int edlx_get_required_token(edlx_ctx_t *ctx, edlx_token_t expect);
 char *edlx_get_lexeme(edlx_ctx_t *ctx);
 char edlx_get_lookahead(edlx_ctx_t *ctx, int *status);
 
-void edlx_print_error(edlx_ctx_t *ctx, const char *errmsg, const int printline);
+void edlx_print_error(edlx_ctx_t *ctx, const char *errmsg, const int printline, const char *prompt);
 
 #endif

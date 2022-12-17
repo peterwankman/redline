@@ -903,7 +903,7 @@ int edps_parse(edps_ctx_t *ctx) {
 
 	if((status = ps_statement(ctx)) != RET_OK) {
 		if(status == RET_ERR_SYNTAX)
-			edlx_print_error(ctx->edlx_ctx, "Syntax error.", ctx->n_subexpr);
+			edlx_print_error(ctx->edlx_ctx, "Syntax error.", ctx->n_subexpr, ctx->prompt);
 		return status;
 	}
 #ifdef CHATTY_PARSER
@@ -927,7 +927,7 @@ void edps_free(edps_ctx_t *ctx) {
 	free(ctx);
 }
 
-edps_ctx_t *edps_new(const char *cmdline, int *status) {
+edps_ctx_t *edps_new(const char *cmdline, const char *prompt, int *status) {
 	edps_ctx_t *ctx;
 
 	if(status == NULL) return NULL;
@@ -949,6 +949,8 @@ edps_ctx_t *edps_new(const char *cmdline, int *status) {
 		free(ctx);
 		return NULL;
 	}
+
+	ctx->prompt = prompt;
 
 	ctx->n_subexpr = 0;
 	*status = RET_OK;

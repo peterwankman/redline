@@ -42,7 +42,7 @@ typedef struct edps_instr_t {
 typedef struct edps_ctx_t edps_ctx_t;
 
 void edps_free(edps_ctx_t *ctx);
-edps_ctx_t *edps_new(const char *cmdline, int *status);
+edps_ctx_t *edps_new(const char *cmdline, const char *prompt, int *status);
 int edps_parse(edps_ctx_t *ctx);
 edps_instr_t *edps_get_instr(edps_ctx_t *ctx);
 

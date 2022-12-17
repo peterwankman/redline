@@ -469,13 +469,21 @@ int edlx_rewind(edlx_ctx_t *ctx) {
 	return RET_OK;
 }
 
-void edlx_print_error(edlx_ctx_t *ctx, const char *errmsg, const int printline) {
+void edlx_print_error(edlx_ctx_t *ctx, const char *errmsg, const int printline, const char *prompt) {
 	size_t i;
+	size_t add_pad = 1;
+
+	if(prompt != NULL) {
+		printf("%s", prompt);
+		add_pad += strlen(prompt);
+	} else {
+		printf(">");
+	}
 
 	if(printline)
-		printf(">%s\n", ctx->cmdline);
+		printf("%s\n", ctx->cmdline);
 
-	for(i = 0; i < ctx->curr_lexeme_end; i++)
+	for(i = 0; i < ctx->curr_lexeme_end + add_pad; i++)
 		printf(" ");
 	printf("^");
 

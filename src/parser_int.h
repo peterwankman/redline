@@ -12,6 +12,7 @@ struct edps_ctx_t {
 	edlx_ctx_t *edlx_ctx;
 	edps_instr_t *instr;
 	int n_subexpr;
+	const char *prompt;
 };
 
 static int ps_after_range(edps_ctx_t *ctx);

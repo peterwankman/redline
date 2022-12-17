@@ -738,7 +738,7 @@ static int write(repl_state_t *state, ed_doc_t *document, edps_instr_t *instr) {
 	else
 		filename = document->filename;
 
-	save_doc(document, filename, 0, end_line);
+	save_doc(document, filename, 0, end_line + 1);
 	return RET_OK;
 }
 
@@ -897,7 +897,7 @@ int repl_main(FILE *input, ed_doc_t *ed_doc, const char *prompt, const char *cur
 		return RET_ERR_INTERNAL;
 
 	while(repl_state->quit == 0) {
-		printf("%s", prompt);
+		printf("%s", repl_state->prompt);
 		cmdline = get_line(input);
 
 		if((parser_ctx = edps_new(cmdline, &status)) == NULL) {
