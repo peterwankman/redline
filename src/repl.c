@@ -43,7 +43,7 @@ static void manual(void) {
 	printf("Search and replace          [startline][,endline][?]Roldtext,newtext\n");
 	printf("Search                      [startline][,endline][?]Stext\n");
 	printf("Transfer                    [toline]Tfilename\n");
-	printf("Write                       [#lines]W\n");
+	printf("Write                       [#lines]W[filename]\n");
 }
 
 static int ask(const char *prompt, FILE *input) {

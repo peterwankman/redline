@@ -21,6 +21,19 @@ In any command which refers to one or multiple lines to be used, you can refer
 to the line with the cursor by using a period as the line to use. For example
 "1,.L" will list the file from beginning until the cursor.
 
+COMMAND LINE:
+=============
+
+* Usage: [binary] [-b] [-h] [-p prompt] [-v] filename
+
+-b: Ignore EOL/EOF characters.
+-h: Print the command line options (like described here).
+-p: Change the prompt from the default "*". 
+-v: Print version and licensing information.
+
+The filename argument is not optional. If the file doesn't exist, it will ne
+created when ending the session or explicitely saving.
+
 COMMANDS:
 =========
 
@@ -135,7 +148,8 @@ given target line.
 
 W:Write
 --------- 
-* Usage: ```[lines]W```
+* Usage: ```[lines]W[filename]```
 
 Saves the file from the beginning of the buffer to the given line. Without
-argument, the whole buffer will be written to disk.
+argument, the whole buffer will be written to disk. If a filename is given,
+the buffer will only be saved to that file, not the originally opened file.
