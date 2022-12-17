@@ -17,8 +17,6 @@
 #include "repl.h"
 #include "util.h"
 
-#define DEFAULT_PROMPT		"*"
-
 static void print_version(void) {
 	printf("%s, version %d.%d.%d, Copyright (C) 2022 Martin Wolters.\n",
 		APP_NAME, APP_VER_MAJOR, APP_VER_MINOR, APP_VER_REV);
@@ -27,21 +25,30 @@ static void print_version(void) {
 }
 
 static void usage(const char *argv) {
-	printf("USAGE: %s [drive:][path]filename [-b]\n", argv);
+	printf("USAGE: %s [drive:][path]filename [-b] [-c] [-p]\n", argv);
 	printf("\t-b\tIgnore End-of-file (CTRL-Z/CTRL-D) characters.\n");
+	printf("\t-c\tChange the cursor. Default: \"%s\".\n", DEFAULT_PROMPT);
+	printf("\t-h\tPrint this help.\n");
+	printf("\t-p\tChange the prompt. Default: \"%s\".\n", DEFAULT_CURSOR);
+	printf("\t-v\tPrint version and licensing information.\n");
 }
 
 int main(int argc, char **argv) {
 	int i, ignore_eof = 0;
-	char *prompt = DEFAULT_PROMPT;
+	char *prompt = NULL;
 	char *filename = NULL;
+	char *cursor = NULL;
 	ed_doc_t *document;
 	FILE *fp;
 
-	while((i = getopt(argc, argv, "bhp:v")) != -1) {
+	while((i = getopt(argc, argv, "bc:hp:v")) != -1) {
 		switch(i) {
 			case 'b':
 				ignore_eof = 1;
+				break;
+
+			case 'c':
+				cursor = optarg;
 				break;
 
 			case 'h':
@@ -80,7 +87,7 @@ int main(int argc, char **argv) {
 		fclose(fp);
 	}
 
-	repl_main(stdin, document, prompt);
+	repl_main(stdin, document, prompt, cursor);
 	free_doc(document);
 
 	return EXIT_SUCCESS;

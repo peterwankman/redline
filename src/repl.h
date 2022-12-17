@@ -11,6 +11,9 @@
 
 #include "dynarr.h"
 
+#define DEFAULT_CURSOR		"*"
+#define DEFAULT_PROMPT		"*"
+
 typedef struct ed_doc_t {
 	dynarr_t *lines_arr;
 	uint32_t n_lines;
@@ -22,6 +25,6 @@ int save_doc(ed_doc_t *doc, const char *filename, const uint32_t start_line, con
 ed_doc_t *load_doc(FILE *fp, const char *filename);
 ed_doc_t *empty_doc(const char *filename);
 
-int repl_main(FILE *input, ed_doc_t *ed_doc, const char *prompt);
+int repl_main(FILE *input, ed_doc_t *ed_doc, const char *prompt, const char *cursor_marker);
 
 #endif

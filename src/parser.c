@@ -892,7 +892,7 @@ static int ps_write(edps_ctx_t *ctx) {
 	return status;
 }
 
- int edps_parse(edps_ctx_t *ctx) {
+int edps_parse(edps_ctx_t *ctx) {
 	int done = 0;
 	int status;
 	int token;
