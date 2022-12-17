@@ -1,0 +1,5 @@
+#!/bin/sh
+
+git rev-list --count HEAD
+
+exit $?
