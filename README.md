@@ -24,11 +24,12 @@ to the line with the cursor by using a period as the line to use. For example
 COMMAND LINE:
 =============
 
-* Usage: [binary] [-b] [-h] [-p prompt] [-v] filename
+* Usage: [binary] [-b] [-c cursor] [-h] [-p prompt] [-v] filename
 
 -b: Ignore EOL/EOF characters.
+-c: Change the cursor marker from the default "*".
 -h: Print the command line options (like described here).
--p: Change the prompt from the default "*". 
+-p: Change the command prompt. Default "*".
 -v: Print version and licensing information.
 
 The filename argument is not optional. If the file doesn't exist, it will ne
