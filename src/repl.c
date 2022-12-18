@@ -171,6 +171,8 @@ static int copy(repl_state_t *state, ed_doc_t *document, edps_instr_t *instr) {
 	char **read_element, *write_element;
 	int status;
 
+	if(document->n_lines == 0) return print_error(RET_ERR_RANGE);
+
 	if(instr->start_line == EDPS_THIS_LINE) start = state->cursor;
 	if(instr->end_line == EDPS_THIS_LINE) end = state->cursor;
 	if(instr->target_line == EDPS_THIS_LINE) target = state->cursor;
@@ -203,6 +205,8 @@ static int copy(repl_state_t *state, ed_doc_t *document, edps_instr_t *instr) {
 static int delete(repl_state_t *state, ed_doc_t *document, edps_instr_t *instr) {
 	uint32_t start = instr->start_line, end = instr->end_line;
 	int status = RET_OK;
+
+	if(document->n_lines == 0) return RET_OK;
 
 	if(instr->start_line == EDPS_THIS_LINE) start = state->cursor;
 	if(instr->start_line == EDPS_NO_LINE) start = 0;
@@ -284,6 +288,9 @@ static int insert(repl_state_t *state, ed_doc_t *document, edps_instr_t *instr) 
 
 	if((instr->only_line == EDPS_NO_LINE) || (instr->only_line == EDPS_THIS_LINE))
 		l = state->cursor;
+
+	if(l > document->n_lines)
+		l = document->n_lines;
 
 	do {
 		read_line = text_prompt(l + 1, state->cursor_marker);

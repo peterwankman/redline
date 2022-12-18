@@ -75,13 +75,8 @@ int main(int argc, char **argv) {
 	}
 
 	if((fp = fopen(filename, "rb")) == NULL) {
-		if((fp = fopen(filename, "wb")) == NULL) {
-			fprintf(stderr, "Couldn't open file '%s'.\n", filename);
-			return 0;
-		} else {
-			printf("New file\n");
-			document = empty_doc(filename);
-		}
+		printf("New file\n");
+		document = empty_doc(filename);
 	} else {
 		if((document = load_doc(fp, filename)) == NULL) return EXIT_FAILURE;
 		fclose(fp);
