@@ -18,6 +18,8 @@ int is_integer(const char *str);
 int is_positive_integer(const char *str);
 uint32_t num_len(int i);
 
+int is_piped(FILE *fp);
+
 #define dec_ext_ctype(f) \
 	int ext_ ## f(const int c);
 

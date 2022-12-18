@@ -112,6 +112,9 @@ static char *text_prompt(const uint32_t line_number, const char *cursor_marker) 
 		return NULL;
 	}
 
+	if(is_piped(stdin))
+		printf("%s\n", read_line);
+
 	return read_line;
 }
 
@@ -908,6 +911,9 @@ int repl_main(FILE *input, ed_doc_t *ed_doc, const char *prompt, const char *cur
 
 		printf("%s", repl_state->prompt);
 		cmdline = get_line(input);
+
+		if(is_piped(stdin))
+			printf("%s\n", cmdline);
 
 		if((parser_ctx = edps_new(cmdline, prompt, &status)) == NULL) {
 			fprintf(stderr, "edlin: Parser initialization failed.\n");

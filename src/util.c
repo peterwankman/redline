@@ -4,6 +4,7 @@
  *****************************************/
 
 #include <ctype.h>
+#include <io.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -143,6 +144,14 @@ uint32_t num_len(int i) {
 	}
 
 	return out;
+}
+
+int is_piped(FILE *fp) {
+#ifdef WIN32
+	return !_isatty(_fileno(fp));
+#else
+	return !isatty(fileno(fp));
+#endif
 }
 
 /* ctype character classification without the crashing */
