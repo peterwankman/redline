@@ -9,7 +9,9 @@
 #include <stdlib.h>
 #include <string.h>
 
-#ifdef WIN32
+#ifdef _WIN32
+#define WIN32_LEAN_AND_MEAN
+#include <Windows.h>
 #include <io.h>
 #endif
 
@@ -43,8 +45,6 @@ char get_key(int *status) {
 	return out;
 }
 #else
-#define WIN32_LEAN_AND_MEAN
-#include <Windows.h>
 char get_key(int *status) {
 	DWORD cc;
 	INPUT_RECORD irec;
@@ -150,7 +150,7 @@ uint32_t num_len(int i) {
 }
 
 int is_piped(FILE *fp) {
-#ifdef WIN32
+#ifdef _WIN32
 	return !_isatty(_fileno(fp));
 #else
 	return !isatty(fileno(fp));
