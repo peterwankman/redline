@@ -338,15 +338,23 @@ static int set_filename(edps_instr_t *instr, const char *filename_str) {
 
 static int ps_after_range(edps_ctx_t *ctx) {
 	edlx_token_t token;
+	char lookahead;
 	int status = RET_OK;
 
 #ifdef CHATTY_PARSER
 	printf("PARSER: ps_after_range()\n");
 #endif
 
-	if(edlx_get_lookahead(ctx->edlx_ctx, &status) == ',') {
-		edlx_step(ctx->edlx_ctx);
-		return ps_target_range(ctx);
+	lookahead = edlx_get_lookahead(ctx->edlx_ctx, &status);
+	if(status != RET_OK) return status;
+
+	switch(lookahead) {
+		case ',':
+			edlx_step(ctx->edlx_ctx);
+			return ps_target_range(ctx);
+
+		case ';':
+			return set_command(ctx->instr, EDPS_CMD_EDIT);
 	}
 
 	edlx_step(ctx->edlx_ctx);
@@ -396,6 +404,7 @@ static int ps_after_range(edps_ctx_t *ctx) {
 			break;
 
 		case EDLX_TOKEN_EOL:
+			set_command(ctx->instr, EDPS_CMD_EDIT);
 			status = RET_OK;
 			break;
 
@@ -761,6 +770,10 @@ static int ps_statement(edps_ctx_t *ctx) {
 			status = ps_standalone_cmd(ctx);
 			break;
 
+		case EDLX_TOKEN_EOL:
+			status = RET_OK;
+			break;
+
 		default:
 			return RET_ERR_SYNTAX;
 	}
@@ -775,6 +788,7 @@ static int ps_statement(edps_ctx_t *ctx) {
 			ctx->n_subexpr++;
 		case EDLX_TOKEN_EOL:
 			edlx_rewind(ctx->edlx_ctx);
+			status = RET_OK;
 			break;
 
 		default:

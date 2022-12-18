@@ -838,7 +838,6 @@ fail:
 
 ed_doc_t *empty_doc(const char *filename) {
 	ed_doc_t *out;
-	char *empty_line;
 
 	if((out = malloc(sizeof(ed_doc_t))) == NULL) return NULL;
 	if((out->lines_arr = dynarr_new(sizeof(void *), PREALLOC_LINES, free)) == NULL) goto fail;
@@ -851,8 +850,6 @@ ed_doc_t *empty_doc(const char *filename) {
 	out->n_lines = 0;
 	return out;
 
-freefilename:
-	free(out->filename);
 freearr:
 	dynarr_free(out->lines_arr);
 fail:
@@ -904,6 +901,11 @@ int repl_main(FILE *input, ed_doc_t *ed_doc, const char *prompt, const char *cur
 		return RET_ERR_INTERNAL;
 
 	while(repl_state->quit == 0) {
+		if(feof(input)) {
+			repl_state->quit = 1;
+			break;
+		}
+
 		printf("%s", repl_state->prompt);
 		cmdline = get_line(input);
 
@@ -933,7 +935,7 @@ int repl_main(FILE *input, ed_doc_t *ed_doc, const char *prompt, const char *cur
 
 			switch(instruction->command) {
 				case EDPS_CMD_NONE:
-					status = edit(repl_state, ed_doc, instruction);
+					/* Nothing to do here. */
 					break;
 
 				case EDPS_CMD_APPEND:
@@ -950,6 +952,10 @@ int repl_main(FILE *input, ed_doc_t *ed_doc, const char *prompt, const char *cur
 
 				case EDPS_CMD_DELETE:
 					status = delete(repl_state, ed_doc, instruction);
+					break;
+
+				case EDPS_CMD_EDIT:
+					status = edit(repl_state, ed_doc, instruction);
 					break;
 
 				case EDPS_CMD_END:
