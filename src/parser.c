@@ -864,12 +864,17 @@ static int ps_transfer(edps_ctx_t *ctx) {
 
 static int ps_write(edps_ctx_t *ctx) {
 	edlx_token_t token;
-	char *lexeme;
+	char lookahead, *lexeme;
 	int status;
 
 #ifdef CHATTY_PARSER
 	printf("PARSER: ps_write()\n");
 #endif
+
+	lookahead = edlx_get_lookahead(ctx->edlx_ctx, &status);
+	if(status != RET_OK) return status;
+
+	if(lookahead == ';') return RET_OK;
 
 	edlx_step(ctx->edlx_ctx);
 	token = edlx_get_token(ctx->edlx_ctx, &status);
