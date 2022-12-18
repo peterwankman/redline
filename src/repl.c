@@ -810,8 +810,9 @@ int save_doc(ed_doc_t *doc, const char *filename, const uint32_t start_line, con
 
 ed_doc_t *load_doc(FILE *fp, const char *filename) {
 	ed_doc_t *out;
-	char *read_line;
-	uint32_t line_number = 0;
+	uint8_t *read_line;
+	uint32_t line_number = 0, line_pos;
+	int maybe_binary = 0;
 
 	if((out = malloc(sizeof(ed_doc_t))) == NULL) return NULL;
 
@@ -821,6 +822,13 @@ ed_doc_t *load_doc(FILE *fp, const char *filename) {
 
 	while(!feof(fp)) {
 		if((read_line = get_line(fp)) == NULL) goto fail;
+
+		for(line_pos = 0; line_pos < strlen(read_line); line_pos++) {
+			if((maybe_binary == 0) && (read_line[line_pos] > 127)) {
+				printf("Warning! This might be a binary file.\n");
+				maybe_binary = 1;
+			}
+		}
 
 		dynarr_append(out->lines_arr, &read_line);
 		out->n_lines++;
