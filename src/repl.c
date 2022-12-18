@@ -776,7 +776,7 @@ int save_doc(ed_doc_t *doc, const char *filename, const uint32_t start_line, con
 		if((out_filename = doc->filename) == NULL)
 			return print_error(RET_ERR_INVALID);
 
-	if((fp = fopen(out_filename, "w")) == NULL)
+	if((fp = fopen(out_filename, "wb")) == NULL)
 		return print_error(RET_ERR_OPEN);
 
 	n_lines = dynarr_get_size(doc->lines_arr);
