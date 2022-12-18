@@ -101,11 +101,11 @@ static void print_line(const repl_state_t *state, const char *line, const uint32
 
 /*/*/
 
-static char *text_prompt(const uint32_t line_number) {
+static char *text_prompt(const uint32_t line_number, const char *cursor_marker) {
 	char *read_line;
 
 	indent(line_number);
-	printf("%d:*", line_number);
+	printf("%d:%s", line_number, cursor_marker);
 
 	if((read_line = get_line(stdin)) == NULL) {
 		print_error(RET_ERR_MALLOC);
@@ -145,7 +145,7 @@ static int append(repl_state_t *state, ed_doc_t *document, edps_instr_t *instr) 
 
 	curr_line = document->n_lines + 1;
 	do {
-		entered_line = text_prompt(curr_line);
+		entered_line = text_prompt(curr_line, state->cursor_marker);
 
 		if(is_empty(entered_line) == RET_YES)
 			break;
@@ -207,7 +207,7 @@ static int delete(repl_state_t *state, ed_doc_t *document, edps_instr_t *instr) 
 	if(instr->start_line == EDPS_THIS_LINE) start = state->cursor;
 	if(instr->start_line == EDPS_NO_LINE) start = 0;
 	if(instr->end_line == EDPS_THIS_LINE) end = state->cursor;
-	if(instr->end_line == EDPS_NO_LINE) end = document->n_lines;
+	if(instr->end_line == EDPS_NO_LINE) end = document->n_lines - 1;
 
 	if(((instr->start_line == EDPS_NO_LINE) && (instr->end_line == EDPS_NO_LINE)) ||
 	    (instr->only_line == EDPS_THIS_LINE)) {
@@ -248,18 +248,18 @@ static int edit(repl_state_t *state, ed_doc_t *document, edps_instr_t *instr) {
 	if(instr->only_line == EDPS_NO_LINE)
 		return print_error(RET_ERR_SYNTAX);
 
-	if(instr->only_line > document->n_lines - 1)
-		return print_error(RET_ERR_INVALID);
+	if(instr->only_line >= document->n_lines)
+		return RET_OK;
 
 	n_line = instr->only_line;
+
 	state->cursor = n_line;
 
 	if((line_str = dynarr_get_element(document->lines_arr, n_line)) == NULL)
-		return print_error(RET_ERR_NULLPO);;
+		return print_error(RET_ERR_NULLPO);
 
-	indent(n_line + 1);
-	printf("%d:*%s\n", n_line + 1, *line_str);
-	if((is_empty(new_line = text_prompt(n_line + 1))) == RET_NO) {
+	print_line(state, *line_str, n_line);
+	if((is_empty(new_line = text_prompt(n_line + 1, state->cursor_marker))) == RET_NO) {
 		if((status = (dynarr_insert(document->lines_arr, &new_line, n_line + 1))) != RET_OK)
 			return print_error(status);
 
@@ -286,7 +286,7 @@ static int insert(repl_state_t *state, ed_doc_t *document, edps_instr_t *instr) 
 		l = state->cursor;
 
 	do {
-		read_line = text_prompt(l + 1);
+		read_line = text_prompt(l + 1, state->cursor_marker);
 
 		if(is_empty(read_line) == RET_YES) {
 			free(read_line);
@@ -311,6 +311,7 @@ static int list(repl_state_t *state, ed_doc_t *document, edps_instr_t *instr) {
 	uint32_t i, lines_shown = 0;
 	char **line;
 
+	if(document->n_lines == 0) return RET_OK;
 
 	/* L command behaviour:
 	 * No arguments:
@@ -423,6 +424,8 @@ static int page(repl_state_t *state, ed_doc_t *document, edps_instr_t *instr) {
 	uint32_t start = instr->start_line, end = instr->end_line;
 	uint32_t i, lines_shown = 0;
 	char **line;
+
+	if(document->n_lines == 0) return RET_OK;
 
 	/* P command behaviour:
 	*
@@ -838,10 +841,7 @@ ed_doc_t *empty_doc(const char *filename) {
 		if((out->filename = str_alloc_copy(filename)) == NULL) goto freearr;
 	}
 
-	if((empty_line = str_alloc_copy("\n")) == NULL) goto freefilename;
-	if(dynarr_append(out->lines_arr, &empty_line) != RET_OK) goto freefilename;
-
-	out->n_lines = 1;
+	out->n_lines = 0;
 	return out;
 
 freefilename:
