@@ -4,7 +4,8 @@ BIN=bin
 
 CC=gcc
 
-CFLAGS=-O0 -ggdb
+#CFLAGS=-O0 -ggdb -DCHATTY_PARSER
+CFLAGS=-O2
 
 PIECES=\
 $(SRC)/rev.h \

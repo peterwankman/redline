@@ -13,8 +13,6 @@
 #include "parser_int.h"
 #include "util.h"
 
-#undef CHATTY_PARSER
-
 /**/
 
 static void print_instr(edps_instr_t *instr) {
