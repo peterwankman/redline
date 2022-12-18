@@ -9,7 +9,7 @@
 #define APP_NAME	"eddie"
 
 #define APP_VER_MAJOR	0
-#define APP_VER_MINOR	2
+#define APP_VER_MINOR	3
 
 #include "rev.h"
 
