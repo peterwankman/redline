@@ -559,7 +559,7 @@ static int ps_repeat(edps_ctx_t *ctx) {
 
 	switch(token) {
 		case EDLX_TOKEN_THIS_LINE:
-			status = set_repeat(ctx->instr, EDPS_THIS_LINE);
+			status = RET_ERR_SYNTAX;
 			break;
 
 		case EDLX_TOKEN_NUMBER:
@@ -843,6 +843,9 @@ static int ps_target_range(edps_ctx_t *ctx) {
 			edlx_rewind(ctx->edlx_ctx);
 			status = ps_move(ctx);
 			break;
+
+		default:
+			return RET_ERR_SYNTAX;
 	}
 
 	return status;
