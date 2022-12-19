@@ -17,6 +17,13 @@
 #define PREALLOC_LINES				16
 #define ERRSTR						"<ERROR>"
 
+#define RANGE_CLASS_ERROR			-1
+#define RANGE_CLASS_NONE			0
+#define RANGE_CLASS_SINGLELINE		1
+#define RANGE_CLASS_STARTONLY		2
+#define RANGE_CLASS_ENDONLY			3
+#define RANGE_CLASS_STARTEND		4
+
 typedef struct repl_state_t {
 	uint32_t cursor;
 	int quit;
@@ -125,25 +132,70 @@ static int is_empty(const char *in) {
 	return RET_NO;
 }
 
+static int classify_range(const edps_instr_t *instr) {
+	if(instr == NULL) return RANGE_CLASS_ERROR;
+
+	if(instr->only_line != EDPS_NO_LINE)
+		return RANGE_CLASS_SINGLELINE;
+
+	if((instr->start_line == EDPS_NO_LINE) &&
+	   (instr->end_line   == EDPS_NO_LINE))
+			return RANGE_CLASS_NONE;
+
+	if((instr->start_line != EDPS_NO_LINE) &&
+	   (instr->end_line   == EDPS_NO_LINE))
+			return RANGE_CLASS_STARTONLY;
+
+	if((instr->start_line == EDPS_NO_LINE) &&
+	   (instr->end_line   != EDPS_NO_LINE))
+			return RANGE_CLASS_ENDONLY;
+
+	if((instr->start_line != EDPS_NO_LINE) &&
+	   (instr->end_line   != EDPS_NO_LINE))
+			return RANGE_CLASS_STARTEND;
+
+	/* We should never end up here. */
+	return RANGE_CLASS_ERROR;
+}
+
+static void resolve_range(repl_state_t *state, edps_instr_t *instr) {
+	if(instr->only_line == EDPS_THIS_LINE)
+		instr->only_line = state->cursor;
+
+	if(instr->start_line == EDPS_THIS_LINE)
+		instr->start_line = state->cursor;
+
+	if(instr->end_line == EDPS_THIS_LINE)
+		instr->end_line = state->cursor;
+}
+
 /**/
 
 static int append(repl_state_t *state, ed_doc_t *document, edps_instr_t *instr) {
 	uint32_t n_lines = 0xffffffff, curr_line;
 	char *entered_line;
-	int status;
+	int range_class, status;
 
-	if((instr->start_line != EDPS_NO_LINE) ||
-	   (instr->end_line != EDPS_NO_LINE) ||
-	   (instr->only_line == EDPS_THIS_LINE))
-		return print_error(RET_ERR_INVALID);
+	/* We can't resolve the lines range here,
+	   because what we're looking for aren't
+	   actually lines. */
+	range_class = classify_range(instr);
+	switch(range_class) {
+		case RANGE_CLASS_NONE:
+			n_lines = 0xffffffff;
+			break;
 
-	if(instr->only_line != EDPS_NO_LINE) {
-		/* The parser returns a zero indexed line
-		 * number, but we don't really mean a
-		 * line number here, we mean the number
-		 * of lines to append.
-		 */
-		n_lines = instr->only_line + 1;
+		case RANGE_CLASS_SINGLELINE:
+			if(instr->only_line == EDPS_THIS_LINE)
+				return print_error(RET_ERR_INVALID);
+			n_lines = instr->only_line + 1;
+			break;
+
+		case RANGE_CLASS_STARTONLY:
+		case RANGE_CLASS_ENDONLY:
+		case RANGE_CLASS_STARTEND:
+		default:
+			return print_error(RET_ERR_RANGE);
 	}
 
 	curr_line = document->n_lines + 1;
@@ -167,8 +219,7 @@ static int append(repl_state_t *state, ed_doc_t *document, edps_instr_t *instr) 
 }
 
 static int copy(repl_state_t *state, ed_doc_t *document, edps_instr_t *instr) {
-	uint32_t start = instr->start_line;
-	uint32_t end = instr->end_line;
+	uint32_t start, end;
 	uint32_t target = instr->target_line;
 	size_t i, rep, copy_size, count = 0, skip = 1;
 	char **read_element, *write_element;
@@ -176,9 +227,9 @@ static int copy(repl_state_t *state, ed_doc_t *document, edps_instr_t *instr) {
 
 	if(document->n_lines == 0) return print_error(RET_ERR_RANGE);
 
-	if(instr->start_line == EDPS_THIS_LINE) start = state->cursor;
-	if(instr->end_line == EDPS_THIS_LINE) end = state->cursor;
-	if(instr->target_line == EDPS_THIS_LINE) target = state->cursor;
+	resolve_range(state, instr);
+	start = instr->start_line;
+	end = instr->end_line;
 
 	if((target > start) && (target <= end))
 		return print_error(RET_ERR_RANGE);
@@ -207,24 +258,40 @@ static int copy(repl_state_t *state, ed_doc_t *document, edps_instr_t *instr) {
 
 static int delete(repl_state_t *state, ed_doc_t *document, edps_instr_t *instr) {
 	uint32_t start = instr->start_line, end = instr->end_line;
-	int status = RET_OK;
+	int range_class, status = RET_OK;
 
 	if(document->n_lines == 0) return RET_OK;
 
-	if(instr->start_line == EDPS_THIS_LINE) start = state->cursor;
-	if(instr->start_line == EDPS_NO_LINE) start = 0;
-	if(instr->end_line == EDPS_THIS_LINE) end = state->cursor;
-	if(instr->end_line == EDPS_NO_LINE) end = document->n_lines - 1;
+	resolve_range(state, instr);
+	range_class = classify_range(instr);
+	switch(range_class) {
+		case RANGE_CLASS_NONE:
+			start = state->cursor;
+			end = state->cursor;
+			break;
 
-	if(((instr->start_line == EDPS_NO_LINE) && (instr->end_line == EDPS_NO_LINE)) ||
-	    (instr->only_line == EDPS_THIS_LINE)) {
-		start = state->cursor;
-		end = state->cursor;
-	}
+		case RANGE_CLASS_SINGLELINE:
+			start = instr->only_line;
+			end = instr->only_line;
+			break;
 
-	if(instr->only_line != EDPS_NO_LINE) {
-		start = instr->only_line;
-		end = instr->only_line;
+		case RANGE_CLASS_STARTONLY:
+			start = instr->start_line;
+			end = document->n_lines - 1;
+			break;
+
+		case RANGE_CLASS_ENDONLY:
+			start = 0;
+			end = instr->end_line;
+			break;
+
+		case RANGE_CLASS_STARTEND:
+			start = instr->start_line;
+			end = instr->end_line;
+			break;
+
+		default:
+			return print_error(RET_ERR_RANGE);
 	}
 
 	if((status = dynarr_delete(document->lines_arr, start, end)) != RET_OK)
@@ -281,16 +348,28 @@ static int edit(repl_state_t *state, ed_doc_t *document, edps_instr_t *instr) {
 }
 
 static int insert(repl_state_t *state, ed_doc_t *document, edps_instr_t *instr) {
-	uint32_t l = instr->only_line;
+	uint32_t l;
 	char *read_line;
-	int status, goon = 1;
+	int range_class, status, goon = 1;
 
-	if((instr->start_line != EDPS_NO_LINE) || (instr->end_line != EDPS_NO_LINE)) {
-		return print_error(RET_ERR_RANGE);
+	resolve_range(state, instr);
+	range_class = classify_range(instr);
+	switch(range_class) {
+		case RANGE_CLASS_NONE:
+			l = state->cursor;
+			break;
+
+		case RANGE_CLASS_SINGLELINE:
+			l = instr->only_line;
+			break;
+
+		case RANGE_CLASS_STARTONLY:
+		case RANGE_CLASS_ENDONLY:
+		case RANGE_CLASS_STARTEND:
+		default:
+			return print_error(RET_ERR_RANGE);
+
 	}
-
-	if((instr->only_line == EDPS_NO_LINE) || (instr->only_line == EDPS_THIS_LINE))
-		l = state->cursor;
 
 	if(l > document->n_lines)
 		l = document->n_lines;
@@ -317,8 +396,9 @@ static int insert(repl_state_t *state, ed_doc_t *document, edps_instr_t *instr) 
 }
 
 static int list(repl_state_t *state, ed_doc_t *document, edps_instr_t *instr) {
-	uint32_t start = instr->start_line, end = instr->end_line;
+	uint32_t start, end;
 	uint32_t i, lines_shown = 0;
+	int range_class;
 	char **line;
 
 	if(document->n_lines == 0) return RET_OK;
@@ -340,49 +420,58 @@ static int list(repl_state_t *state, ed_doc_t *document, edps_instr_t *instr) {
 	 *		Why? Don't as me.
 	 */
 
-	/* No args case */
-	if((instr->only_line == EDPS_NO_LINE) &&
-	   (instr->start_line == EDPS_NO_LINE) &&
-	   (instr->end_line == EDPS_NO_LINE)) {
-		if(state->cursor < 12) {
-			start = 0;
-		} else {
-			start = state->cursor - 11;
-		}
-		end = start + 23;
-	/* One arg, first case (#L) */
-	} else if(instr->only_line != EDPS_NO_LINE) {
-		if(instr->only_line == EDPS_THIS_LINE) {
-			start = state->cursor;
-		} else {
-			start = instr->only_line;
-		}
-		end = start + 23;
-	/* One arg, second case (#,L) */
-	} else if((instr->start_line != EDPS_NO_LINE) &&
-		(instr->end_line == EDPS_NO_LINE)) {
-		if(instr->start_line == EDPS_THIS_LINE) {
-			start = state->cursor;
-		} else {
-			start = instr->start_line;
-		}
-		end = start + 23;
-	/* One arg, third case (,#L) */
-	} else if((instr->start_line == EDPS_NO_LINE) &&
-		(instr->end_line != EDPS_NO_LINE)) {
-		if(instr->end_line == EDPS_THIS_LINE)
-			instr->end_line = state->cursor;
-
-		if(instr->end_line >= state->cursor - 11) {
-			if(state->cursor < 12)
+	range_class = classify_range(instr);
+	switch(range_class) {
+		case RANGE_CLASS_NONE:
+			if(state->cursor < 12) {
 				start = 0;
-			else
+			} else {
 				start = state->cursor - 11;
+			}
+			end = start + 23;
+			break;
+
+		case RANGE_CLASS_SINGLELINE:
+			if(instr->only_line == EDPS_THIS_LINE) {
+				start = state->cursor;
+			} else {
+				start = instr->only_line;
+			}
+			end = start + 23;
+			break;
+
+		case RANGE_CLASS_STARTONLY:
+			if(instr->start_line == EDPS_THIS_LINE) {
+				start = state->cursor;
+			} else {
+				start = instr->start_line;
+			}
+			end = start + 23;
+			break;
+
+		case RANGE_CLASS_ENDONLY:
+			if(instr->end_line == EDPS_THIS_LINE)
+				instr->end_line = state->cursor;
+
+			if(instr->end_line >= state->cursor - 11) {
+				if(state->cursor < 12)
+					start = 0;
+				else
+					start = state->cursor - 11;
+				end = instr->end_line;
+			} else {
+				start = instr->end_line;
+				end = state->cursor + 12;
+			}
+			break;
+
+		case RANGE_CLASS_STARTEND:
+			start = instr->start_line;
 			end = instr->end_line;
-		} else {
-			start = instr->end_line;
-			end = state->cursor + 12;
-		}
+			break;
+
+		default:
+			return print_error(RET_ERR_RANGE);
 	}
 
 	if(end > document->n_lines - 1)
@@ -406,14 +495,14 @@ static int list(repl_state_t *state, ed_doc_t *document, edps_instr_t *instr) {
 }
 
 static int move(repl_state_t *state, ed_doc_t *document, edps_instr_t *instr) {
-	uint32_t start = instr->start_line;
-	uint32_t end = instr->end_line;
+	uint32_t start, end;
 	uint32_t target = instr->target_line;
 	uint32_t move_range;
 	int status;
 
-	if(instr->start_line == EDPS_THIS_LINE) start = state->cursor;
-	if(instr->end_line == EDPS_THIS_LINE) end = state->cursor;
+	resolve_range(state, instr);
+	start = instr->start_line;
+	end = instr->end_line;
 
 	if((target >= start) && (target <= end))
 		return print_error(RET_ERR_RANGE);
@@ -431,8 +520,9 @@ static int move(repl_state_t *state, ed_doc_t *document, edps_instr_t *instr) {
 }
 
 static int page(repl_state_t *state, ed_doc_t *document, edps_instr_t *instr) {
-	uint32_t start = instr->start_line, end = instr->end_line;
+	uint32_t start, end;
 	uint32_t i, lines_shown = 0;
+	int range_class;
 	char **line;
 
 	if(document->n_lines == 0) return RET_OK;
@@ -454,40 +544,42 @@ static int page(repl_state_t *state, ed_doc_t *document, edps_instr_t *instr) {
 	*		(,#P): start = cursor + 1; end = #
 	*/
 
-	/* No args case (P) */
-	if((instr->only_line == EDPS_NO_LINE) &&
-		(instr->start_line == EDPS_NO_LINE) &&
-		(instr->end_line == EDPS_NO_LINE)) {
-		if(state->cursor == 0) {
-			start = 0;
-		} else {
-			start = state->cursor + 1;
-		}
-		end = start + 22;
-		/* One arg, first case (#P) */
-	} else if(instr->only_line != EDPS_NO_LINE) {
-		if(instr->only_line == EDPS_THIS_LINE) {
-			start = state->cursor;
-		} else {
+	resolve_range(state, instr);
+	range_class = classify_range(instr);
+	switch(range_class) {
+		case RANGE_CLASS_NONE:
+			if(state->cursor == 0) {
+				start = 0;
+			} else {
+				start = state->cursor + 1;
+			}
+			end = start + 22;
+			break;
+
+		case RANGE_CLASS_SINGLELINE:
 			start = instr->only_line;
-		}
-		end = start + 22;
-		/* One arg, second case (#,P) */
-	} else if((instr->start_line != EDPS_NO_LINE) &&
-		(instr->end_line == EDPS_NO_LINE)) {
-		if(instr->start_line == EDPS_THIS_LINE) {
-			start = state->cursor;
-		} else {
+			end = start + 22;
+			break;
+
+		case RANGE_CLASS_STARTONLY:
 			start = instr->start_line;
-		}
-		end = start + 22;
-		/* One arg, third case (,#P) */
-	} else if((instr->start_line == EDPS_NO_LINE) &&
-		(instr->end_line != EDPS_NO_LINE)) {
-		start = state->cursor;
-		if(state->cursor != 0)
-			start++;
-		end = instr->end_line;
+			end = start + 22;
+			break;
+
+		case RANGE_CLASS_ENDONLY:
+			start = state->cursor;
+			if(state->cursor != 0)
+				start++;
+			end = instr->end_line;
+			break;
+
+		case RANGE_CLASS_STARTEND:
+			start = instr->start_line;
+			end = instr->end_line;
+			break;
+
+		default:
+			return RET_ERR_RANGE;
 	}
 
 	if(end > document->n_lines - 1)
@@ -697,14 +789,22 @@ static int transfer(repl_state_t *state, ed_doc_t *document, edps_instr_t *instr
 	char **input_data, *copy_data;
 	FILE *fp;
 	int status;
-	
-	if((instr->start_line != EDPS_NO_LINE) || (instr->end_line != EDPS_NO_LINE)) {
-		return print_error(RET_ERR_RANGE);
-	}
-	if(instr->only_line == EDPS_NO_LINE) {
-		insert_line = state->cursor;
-	} else {
-		insert_line = instr->only_line;
+	int range_class;
+
+	resolve_range(state, instr);
+	range_class = classify_range(instr);
+	switch(range_class) {
+		case RANGE_CLASS_SINGLELINE:
+			insert_line = instr->only_line;
+			break;
+
+		case RANGE_CLASS_NONE:
+		case RANGE_CLASS_STARTONLY:
+		case RANGE_CLASS_ENDONLY:
+		case RANGE_CLASS_STARTEND:
+		default:
+			return print_error(RET_ERR_RANGE);
+
 	}
 
 	if((fp = fopen(instr->filename, "r")) == NULL)
@@ -737,14 +837,24 @@ fail:
 static int write(repl_state_t *state, ed_doc_t *document, edps_instr_t *instr) {
 	uint32_t end_line;
 	char *filename;
+	int range_class;
 
-	if((instr->start_line != EDPS_NO_LINE) || (instr->end_line != EDPS_NO_LINE))
-		return print_error(RET_ERR_RANGE);
+	range_class = classify_range(instr);
+	switch(range_class) {
+		case RANGE_CLASS_NONE:
+			end_line = document->n_lines;
+			break;
 
-	if(instr->only_line == EDPS_NO_LINE)
-		end_line = document->n_lines;
-	else
-		end_line = instr->only_line;
+		case RANGE_CLASS_SINGLELINE:
+			end_line = instr->only_line;
+			break;
+
+		case RANGE_CLASS_STARTONLY:
+		case RANGE_CLASS_ENDONLY:
+		case RANGE_CLASS_STARTEND:
+		default:
+			return print_error(RET_ERR_RANGE);
+	}
 
 	if(instr->filename != NULL)
 		filename = instr->filename;
