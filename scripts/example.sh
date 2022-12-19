@@ -16,4 +16,10 @@ fi
 
 $BINARY $SAMPLE < $EDSCRIPT
 
+echo
+echo ----- LINED VERSION: -----
+$BINARY -v
+echo --------------------------
+echo
+
 echo Result is now in $RESULT
