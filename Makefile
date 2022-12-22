@@ -9,6 +9,7 @@ CC=$(NATIVE_CC)
 
 CFLAGS_RELEASE=-O2
 CFLAGS_DEBUG=-O0 -ggdb
+CFLAGS_AFL=-DAFL_BUILD $(CFLAGS_DEBUG)
 
 CFLAGS=$(CFLAGS_DEBUG)
 
@@ -44,18 +45,18 @@ clean:
 	rm -f $(BIN)/*
 	rm -f $(SRC)/rev.h
 
-debug: $(BIN)/fred
+debug:
 	rm -f $(OBJ)/*
 	make CFLAGS="$(CFLAGS_DEBUG)" $(BIN)/fred
-	cp $^ $(BIN)/fred-debug
+	cp $(BIN)/fred $(BIN)/fred-debug
 
-release: $(BIN)/fred
+release:
 	rm -f $(OBJ)/*
 	make CFLAGS="$(CFLAGS_RELEASE)" $(BIN)/fred
-	cp $^ $(BIN)/fred-release
+	cp $(BIN)/fred $(BIN)/fred-release
 	strip $(BIN)/fred-release
 
-afl: $(BIN)/fred
+afl:
 	rm -f $(OBJ)/*
-	make CC=$(AFL_CC) CFLAGS="$(CFLAGS_DEBUG)" $(BIN)/fred
-	cp $^ $(BIN)/afl-ed
+	make CC=$(AFL_CC) CFLAGS="$(CFLAGS_AFL)" $(BIN)/fred
+	cp $(BIN)/fred $(BIN)/afl-ed

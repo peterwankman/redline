@@ -7,6 +7,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#ifdef AFL_BUILD
+#include <time.h>
+#endif
+
 
 #include "ermac.h"
 #include "lexer.h"
@@ -881,6 +885,9 @@ int save_doc(ed_doc_t *doc, const char *filename, const uint32_t start_line, con
 	size_t pos, bytes_written, to_write;
 	int fix_line = 0;
 	char **line_data;
+#ifdef AFL_BUILD
+	char afl_filename[16];
+#endif
 
 	if(doc == NULL)
 		return print_error(RET_ERR_INVALID);
@@ -889,7 +896,13 @@ int save_doc(ed_doc_t *doc, const char *filename, const uint32_t start_line, con
 		if((out_filename = doc->filename) == NULL)
 			return print_error(RET_ERR_INVALID);
 
+#ifdef AFL_BUILD
+	srand(time(NULL));
+	sprintf(afl_filename, "afl-output-%d", rand());
+	if((fp = fopen(afl_filename, "wb")) == NULL)
+#else
 	if((fp = fopen(out_filename, "wb")) == NULL)
+#endif
 		return print_error(RET_ERR_OPEN);
 
 	n_lines = dynarr_get_size(doc->lines_arr);

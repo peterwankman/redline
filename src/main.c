@@ -17,6 +17,10 @@
 #include "repl.h"
 #include "util.h"
 
+#ifdef AFL_BUILD
+#define AFL_TEMPFILE	"aflinput.txt"
+#endif
+
 static void print_version(void) {
 	printf("%s, version %d.%d.%d, Copyright (C) 2022 Martin Wolters.\n",
 		APP_NAME, APP_VER_MAJOR, APP_VER_MINOR, APP_VER_REV);
@@ -40,6 +44,10 @@ int main(int argc, char **argv) {
 	char *cursor = NULL;
 	ed_doc_t *document;
 	FILE *fp;
+#ifdef AFL_BUILD
+	char *input_line;
+	FILE *afl_fp;
+#endif
 
 	while((i = getopt(argc, argv, "bc:hp:v")) != -1) {
 		switch(i) {
@@ -73,8 +81,27 @@ int main(int argc, char **argv) {
 		fprintf(stderr, "File name must be specified.\n");
 		return EXIT_FAILURE;
 	}
+#ifdef AFL_BUILD
+	printf("AFL_BUILD! Creating temp file '%s'.\n", AFL_TEMPFILE);
+	if((afl_fp = fopen(filename, "rb")) == NULL)
+		return EXIT_FAILURE;
 
+	if((fp = fopen(AFL_TEMPFILE, "w")) == NULL)
+		return EXIT_FAILURE;
+
+	while(!feof(afl_fp)) {
+		input_line = get_line(afl_fp);
+		fwrite(input_line, strlen(input_line), 1, fp);
+		fputc('\n', fp);
+		free(input_line);
+	}
+	fclose(fp);
+	fclose(afl_fp);
+
+	if((fp = fopen(AFL_TEMPFILE, "rb")) == NULL) {
+#else
 	if((fp = fopen(filename, "rb")) == NULL) {
+#endif
 		printf("New file\n");
 		document = empty_doc(filename);
 	} else {

@@ -6,10 +6,10 @@
 #ifndef APPINFO_H_
 #define APPINFO_H_
 
-#define APP_NAME	"eddie"
+#define APP_NAME	"edsel"
 
 #define APP_VER_MAJOR	0
-#define APP_VER_MINOR	5
+#define APP_VER_MINOR	6
 
 #include "rev.h"
 
