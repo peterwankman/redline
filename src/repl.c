@@ -66,6 +66,9 @@ static int ask(const char *prompt, FILE *input) {
 	int status;
 	char reply;
 
+#ifdef AFL_BUILD
+	return RET_YES;
+#else
 	for(;;) {
 		printf("%s (Y/N)? ", prompt);
 		fflush(stdout);
@@ -80,6 +83,7 @@ static int ask(const char *prompt, FILE *input) {
 		if(toupper(reply) == 'Y') return RET_YES;
 		if(toupper(reply) == 'N') return RET_NO;
 	}
+#endif
 	return 0;
 }
 
