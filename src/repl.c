@@ -11,6 +11,7 @@
 #include <time.h>
 #endif
 
+#include "leak.h"
 
 #include "ermac.h"
 #include "lexer.h"

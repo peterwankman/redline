@@ -10,6 +10,8 @@
 
 #include <stdlib.h>
 
+#include "leak.h"
+
 #include "appinfo.h"
 #include "ermac.h"
 #include "util.h"

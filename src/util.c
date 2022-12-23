@@ -15,6 +15,8 @@
 #include <io.h>
 #endif
 
+#include "leak.h"
+
 #include "ermac.h"
 
 #define MAXBUF		1024

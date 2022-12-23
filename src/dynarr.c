@@ -7,6 +7,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "leak.h"
+
 #include "dynarr.h"
 #include "ermac.h"
 
