@@ -879,6 +879,11 @@ static int write(repl_state_t *state, ed_doc_t *document, edps_instr_t *instr) {
 
 /*/*/
 
+static void free_element(void **data) {
+	void *element = *data;
+	free(element);
+}
+
 void free_doc(ed_doc_t *doc) {
 	if(doc == NULL) return;
 	if(doc->filename != NULL) free(doc->filename);
@@ -947,7 +952,7 @@ ed_doc_t *load_doc(FILE *fp, const char *filename) {
 
 	if((out = malloc(sizeof(ed_doc_t))) == NULL) return NULL;
 
-	if((out->lines_arr = dynarr_new(sizeof(void *), PREALLOC_LINES, free)) == NULL)
+	if((out->lines_arr = dynarr_new(sizeof(void *), PREALLOC_LINES, free_element)) == NULL)
 		return NULL;
 	out->n_lines = 0;
 

@@ -69,10 +69,11 @@ int dynarr_append(dynarr_t *arr, const void *data) {
 	return RET_OK;
 }
 
-int dynarr_delete(dynarr_t *arr, const size_t start_index, const size_t end_index) {
+ int dynarr_delete(dynarr_t *arr, const size_t start_index, const size_t end_index) {
 	size_t actual_start, actual_end;
-	size_t del_size, tail_size;
+	size_t del_size, tail_size, i;
 	uint8_t *move_from, *move_to;
+	void **element;
 
 	if(arr == NULL) return RET_ERR_NULLPO;
 	if(start_index > arr->n_used - 1) return RET_ERR_RANGE;
@@ -86,6 +87,11 @@ int dynarr_delete(dynarr_t *arr, const size_t start_index, const size_t end_inde
 
 	del_size = (actual_end - actual_start + 1); /* Include both ends. */
 	tail_size = arr->n_used - actual_end - 1;
+
+	for(i = actual_start; i < actual_end + 1; i++) {
+		if((element = dynarr_get_element(arr, i)) != NULL)
+			arr->freefunc(element);
+	}
 
 	move_from = dynarr_get_element(arr, actual_end + 1);
 	move_to = dynarr_get_element(arr, actual_start);
@@ -200,7 +206,7 @@ void dynarr_free(dynarr_t *arr) {
 	for(i = 0; i < arr->n_used; i++) {
 		element = dynarr_get_element(arr, i);
 		if(freefunc != NULL)
-			freefunc(*element);
+			freefunc(element);
 	}
 
 	if(arr->data != NULL)
