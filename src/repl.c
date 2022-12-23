@@ -516,6 +516,9 @@ static int move(repl_state_t *state, ed_doc_t *document, edps_instr_t *instr) {
 	start = instr->start_line;
 	end = instr->end_line;
 
+	if((start > document->n_lines) || (end > document->n_lines))
+		return print_error(RET_ERR_RANGE);
+
 	if((target >= start) && (target <= end))
 		return print_error(RET_ERR_RANGE);
 
@@ -879,9 +882,12 @@ static int write(repl_state_t *state, ed_doc_t *document, edps_instr_t *instr) {
 
 /*/*/
 
-static void free_element(void **data) {
-	void *element = *data;
-	free(element);
+static void free_element(void *data) {
+	uint8_t **dbl_ptr, *sng_ptr;
+
+	dbl_ptr = data;
+	sng_ptr = *dbl_ptr;
+	free(sng_ptr);
 }
 
 void free_doc(ed_doc_t *doc) {
@@ -898,9 +904,6 @@ int save_doc(ed_doc_t *doc, const char *filename, const uint32_t start_line, con
 	size_t pos, bytes_written, to_write;
 	int fix_line = 0;
 	char **line_data;
-#ifdef AFL_BUILD
-	char afl_filename[16];
-#endif
 
 	if(doc == NULL)
 		return print_error(RET_ERR_INVALID);
@@ -910,9 +913,7 @@ int save_doc(ed_doc_t *doc, const char *filename, const uint32_t start_line, con
 			return print_error(RET_ERR_INVALID);
 
 #ifdef AFL_BUILD
-	srand(time(NULL));
-	sprintf(afl_filename, "afl-output-%d", rand() % 10000);
-	if((fp = fopen(afl_filename, "wb")) == NULL)
+	if((fp = fopen("/dev/null", "wb")) == NULL)
 #else
 	if((fp = fopen(out_filename, "wb")) == NULL)
 #endif

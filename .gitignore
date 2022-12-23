@@ -2,3 +2,6 @@ dump
 .vs
 *.suo
 *.txt
+*.edl
+afl-in
+afl-out
