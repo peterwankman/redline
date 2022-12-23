@@ -104,7 +104,7 @@
     <IntDir>$(Platform)\$(Configuration)\</IntDir>
     <CustomBuildBeforeTargets>
     </CustomBuildBeforeTargets>
-    <TargetName>edlin samples\lowerbible.txt</TargetName>
+    <TargetName>bleed</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
@@ -112,7 +112,7 @@
     <IntDir>$(Platform)\$(Configuration)\</IntDir>
     <CustomBuildBeforeTargets>
     </CustomBuildBeforeTargets>
-    <TargetName>edlin samples\lowerbible.txt</TargetName>
+    <TargetName>bleed</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
@@ -120,14 +120,14 @@
     <IntDir>$(Platform)\$(Configuration)\</IntDir>
     <CustomBuildBeforeTargets>
     </CustomBuildBeforeTargets>
-    <TargetName>edlin samples\lowerbible.txt</TargetName>
+    <TargetName>bleed</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">
     <LinkIncremental>true</LinkIncremental>
     <OutDir>$(SolutionDir)bin\$(Platform)\$(Configuration)\</OutDir>
     <IntDir>$(Platform)\$(Configuration)\</IntDir>
     <CustomBuildBeforeTargets />
-    <TargetName>edlin samples\lowerbible.txt</TargetName>
+    <TargetName>bleed</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
@@ -135,14 +135,14 @@
     <IntDir>$(Platform)\$(Configuration)\</IntDir>
     <CustomBuildBeforeTargets>
     </CustomBuildBeforeTargets>
-    <TargetName>edlin samples\lowerbible.txt</TargetName>
+    <TargetName>bleed</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">
     <LinkIncremental>false</LinkIncremental>
     <OutDir>$(SolutionDir)bin\$(Platform)\$(Configuration)\</OutDir>
     <IntDir>$(Platform)\$(Configuration)\</IntDir>
     <CustomBuildBeforeTargets />
-    <TargetName>edlin samples\lowerbible.txt</TargetName>
+    <TargetName>bleed</TargetName>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -343,6 +343,7 @@ popd</Command>
   <ItemGroup>
     <ClInclude Include="..\..\src\dynarr.h" />
     <ClInclude Include="..\..\src\ermac.h" />
+    <ClInclude Include="..\..\src\leak.h" />
     <ClInclude Include="..\..\src\lexer.h" />
     <ClInclude Include="..\..\src\parser.h" />
     <ClInclude Include="..\..\src\parser_int.h" />
