@@ -66,6 +66,9 @@ static int ask(const char *prompt, FILE *input) {
 	int status;
 	char reply;
 
+#ifdef AFL_BUILD
+	return RET_YES;
+#else
 	for(;;) {
 		printf("%s (Y/N)? ", prompt);
 		fflush(stdout);
@@ -80,6 +83,7 @@ static int ask(const char *prompt, FILE *input) {
 		if(toupper(reply) == 'Y') return RET_YES;
 		if(toupper(reply) == 'N') return RET_NO;
 	}
+#endif
 	return 0;
 }
 
@@ -297,6 +301,9 @@ static int delete(repl_state_t *state, ed_doc_t *document, edps_instr_t *instr) 
 		default:
 			return print_error(RET_ERR_RANGE);
 	}
+
+	if(end >= document->n_lines)
+		end = document->n_lines - 1;
 
 	if((status = dynarr_delete(document->lines_arr, start, end)) != RET_OK)
 		return print_error(RET_ERR_INVALID);
@@ -898,7 +905,7 @@ int save_doc(ed_doc_t *doc, const char *filename, const uint32_t start_line, con
 
 #ifdef AFL_BUILD
 	srand(time(NULL));
-	sprintf(afl_filename, "afl-output-%d", rand());
+	sprintf(afl_filename, "afl-output-%d", rand() % 10000);
 	if((fp = fopen(afl_filename, "wb")) == NULL)
 #else
 	if((fp = fopen(out_filename, "wb")) == NULL)
