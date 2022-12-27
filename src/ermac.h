@@ -21,6 +21,8 @@
 #define RET_ERR_OPEN			-8
 #define RET_ERR_READ			-9
 #define RET_ERR_WRITE			-10
+#define RET_ERR_LEXER			-11
+#define RET_ERR_PARSER			-12
 #define RET_ERR_DOUBLE			-100
 
 char *str_error(const int err_no);

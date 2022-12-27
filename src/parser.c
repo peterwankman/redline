@@ -180,9 +180,9 @@ static int set_start_range(edps_instr_t *instr, const int line) {
 	printf("PARSER: set_start_range(%d)\n", line);
 #endif
 
-	if(instr->start_line != EDPS_NO_LINE) {
-		fprintf(stderr, "edlin: Parser claims to have seen multiple ranges.\n");
-		return RET_ERR_INTERNAL;
+	if((instr->start_line != EDPS_NO_LINE) || (instr->only_line != EDPS_NO_LINE)) {
+		fprintf(stderr, "Parser: Encountered multiple ranges.\n");
+		return print_error(RET_ERR_PARSER);
 	}
 	instr->start_line = line > 0 ? line - 1 : line;
 	return RET_OK;
@@ -193,9 +193,9 @@ static int set_end_range(edps_instr_t *instr, const int line) {
 	printf("PARSER: set_end_range(%d)\n", line);
 #endif
 
-	if(instr->end_line != EDPS_NO_LINE) {
-		fprintf(stderr, "edlin: Parser claims to have seen multiple ranges.\n");
-		return RET_ERR_SYNTAX;
+	if((instr->end_line != EDPS_NO_LINE) || (instr->only_line != EDPS_NO_LINE)) {
+		fprintf(stderr, "Parser: Encountered multiple ranges.\n");
+		return print_error(RET_ERR_PARSER);
 	}
 	instr->end_line = line > 0 ? line - 1 : line;
 	return RET_OK;
@@ -206,13 +206,11 @@ static int set_only_line(edps_instr_t *instr, const int line) {
 	printf("PARSER: set_only_line(%d)\n", line);
 #endif
 
-	if(instr->only_line != EDPS_NO_LINE) {
-		fprintf(stderr, "edlin: Parser claims to have seen multiple ranges.\n");
-		return RET_ERR_SYNTAX;
-	} else if((instr->start_line != EDPS_NO_LINE) ||
-			  (instr->end_line != EDPS_NO_LINE)) {
-		fprintf(stderr, "edlin: Parser claims to have seen multiple ranges.\n");
-		return RET_ERR_INTERNAL;
+	if((instr->only_line != EDPS_NO_LINE) ||
+	   (instr->start_line != EDPS_NO_LINE) ||
+	   (instr->end_line != EDPS_NO_LINE)) {
+			fprintf(stderr, "Parser: Encountered multiple ranges.\n");
+			return print_error(RET_ERR_PARSER);;
 	}
 	instr->only_line = line > 0 ? line - 1 : line;
 	return RET_OK;
@@ -224,8 +222,8 @@ static int set_target(edps_instr_t *instr, const int line) {
 #endif
 
 	if(instr->target_line != EDPS_NO_LINE) {
-		fprintf(stderr, "edlin: Parser claims to have seen multiple targets.\n");
-		return RET_ERR_SYNTAX;
+		fprintf(stderr, "Parser: Encountered multiple targets.\n");
+		return print_error(RET_ERR_PARSER);
 	}
 	instr->target_line = line > 0 ? line - 1 : line;
 	return RET_OK;
@@ -237,8 +235,8 @@ static int set_repeat(edps_instr_t *instr, const int n) {
 #endif
 
 	if(instr->repeat != 1) {
-		fprintf(stderr, "edlin: Parser claims to have seen multiple repetitions.\n");
-		return RET_ERR_SYNTAX;
+		fprintf(stderr, "Parser: Encountered multiple repetitions.\n");
+		return print_error(RET_ERR_PARSER);
 	}
 	instr->repeat = n;
 	return RET_OK;
@@ -250,8 +248,8 @@ static int set_command(edps_instr_t *instr, const edps_cmd_t command) {
 #endif
 
 	if(instr->command != EDPS_CMD_NONE) {
-		fprintf(stderr, "edlin: Parser claims to have seen multiple commands.\n");
-		return RET_ERR_SYNTAX;
+		fprintf(stderr, "Parser: Encountered multiple commands.\n");
+		return print_error(RET_ERR_PARSER);
 	}
 	instr->command = command;
 	return RET_OK;
@@ -263,8 +261,8 @@ static int set_ask(edps_instr_t *instr) {
 #endif
 
 	if(instr->ask != 0) {
-		fprintf(stderr, "edlin: Parser claims to have seen multiple commands.\n");
-		return RET_ERR_SYNTAX;
+		fprintf(stderr, "Parser: Encountered multiple commands.\n");
+		return print_error(RET_ERR_PARSER);
 	}
 	instr->ask = RET_YES;
 	return RET_OK;
@@ -276,14 +274,14 @@ static int set_search(edps_instr_t *instr, const char *search_str) {
 #endif
 
 	if(instr->search_str != NULL) {
-		fprintf(stderr, "edlin: Parser claims to have seen multiple search strings.\n");
-		return RET_ERR_INTERNAL;
+		fprintf(stderr, "Parser: Encountered multiple search strings.\n");
+		return print_error(RET_ERR_PARSER);
 	}
 
 	if(search_str != NULL) {
 		if((instr->search_str = str_alloc_copy(search_str)) == NULL) {
-			fprintf(stderr, "edlin: Search string allocation failed.\n");
-			return RET_ERR_INTERNAL;
+			fprintf(stderr, "Parser: Couldn't save the search string.\n");
+			return print_error(RET_ERR_MALLOC);
 		}
 	} else {
 		instr->search_str = NULL;
@@ -292,20 +290,19 @@ static int set_search(edps_instr_t *instr, const char *search_str) {
 }
 
 static int set_replace(edps_instr_t *instr, const char *replace_str) {
-
 #ifdef CHATTY_PARSER
 	printf("PARSER: set_replace(\"%s\")\n", replace_str);
 #endif
 
 	if(instr->replace_str != NULL) {
-		fprintf(stderr, "edlin: Parser claims to have seen multiple replace strings.\n");
-		return RET_ERR_SYNTAX;
+		fprintf(stderr, "Parser: Encountered multiple replacement strings.\n");
+		return print_error(RET_ERR_PARSER);
 	}
 
 	if(replace_str != NULL) {
 		if((instr->replace_str = str_alloc_copy(replace_str)) == NULL) {
-			fprintf(stderr, "edlin: Couldn't copy search string.\n");
-			return RET_ERR_INTERNAL;
+			fprintf(stderr, "Parser: Couldn't save the replacement string.\n");
+			return print_error(RET_ERR_MALLOC);
 		}
 	} else {
 		instr->replace_str = NULL;
@@ -319,14 +316,14 @@ static int set_filename(edps_instr_t *instr, const char *filename_str) {
 #endif
 
 	if(instr->filename != NULL) {
-		fprintf(stderr, "edlin: Parser claims to have seen multiple input files.\n");
-		return RET_ERR_INTERNAL;
+		fprintf(stderr, "Parser: Encountered multiple input files.\n");
+		return print_error(RET_ERR_PARSER);
 	}
 
 	if(filename_str != NULL) {
 		if((instr->filename = str_alloc_copy(filename_str)) == NULL) {
-			fprintf(stderr, "edlin: Transfer file string allocation failed.\n");
-			return RET_ERR_INTERNAL;
+			fprintf(stderr, "Parser: Couldn't save the input filename.\n");
+			return print_error(RET_ERR_MALLOC);
 		}
 	} else {
 		instr->filename = NULL;
