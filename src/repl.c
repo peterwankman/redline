@@ -168,14 +168,46 @@ static int classify_range(const edps_instr_t *instr) {
 }
 
 static void resolve_range(repl_state_t *state, edps_instr_t *instr) {
-	if(instr->only_line == EDPS_THIS_LINE)
+#ifdef CHATTY_PARSER
+	uint8_t n_subs = 0;
+	const uint8_t sub_only = 0x01;
+	const uint8_t sub_start = 0x02;
+	const uint8_t sub_end = 0x04;
+#endif
+	if(instr->only_line == EDPS_THIS_LINE) {
 		instr->only_line = state->cursor;
+#ifdef CHATTY_PARSER
+		n_subs |= sub_only;
+#endif
+	}
 
-	if(instr->start_line == EDPS_THIS_LINE)
+	if(instr->start_line == EDPS_THIS_LINE) {
 		instr->start_line = state->cursor;
+#ifdef CHATTY_PARSER
+		n_subs |= sub_start;
+#endif
+	}
 
-	if(instr->end_line == EDPS_THIS_LINE)
+	if(instr->end_line == EDPS_THIS_LINE) {
 		instr->end_line = state->cursor;
+#ifdef CHATTY_PARSER
+		n_subs |= sub_end;
+#endif
+	}
+
+#ifdef CHATTY_PARSER
+	printf("Range resolver: ");
+	if(n_subs > 0) {
+		if(n_subs & sub_only)
+			printf(" Line %d\n", instr->only_line + 1);
+
+		if((n_subs & sub_start) || (n_subs & sub_end))
+			printf(" Range From %d to %d\n",
+				instr->start_line + 1, instr->end_line + 1);
+	} else {
+		printf("No substitutions.\n");
+	}
+#endif
 }
 
 /**/
