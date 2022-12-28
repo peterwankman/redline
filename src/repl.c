@@ -259,7 +259,8 @@ static int append(repl_state_t *state, ed_doc_t *document, edps_instr_t *instr) 
 static int copy(repl_state_t *state, ed_doc_t *document, edps_instr_t *instr) {
 	uint32_t start, end;
 	uint32_t target = instr->target_line;
-	size_t i, rep, copy_size, count = 0, skip = 1;
+	uint32_t read_line;
+	size_t i, rep, copy_size, count = 0, skip = 0;
 	char **read_element, *write_element;
 	int status;
 
@@ -273,11 +274,13 @@ static int copy(repl_state_t *state, ed_doc_t *document, edps_instr_t *instr) {
 		return print_error(RET_ERR_RANGE);
 
 	copy_size = (end - start) + 1;
-	if(target <= start) skip = 2;
+	if(target <= start) skip = 1;
 
 	for(rep = 0; rep < instr->repeat; rep++) {
 		for(i = 0; i < copy_size; i++) {
-			if((read_element = dynarr_get_element(document->lines_arr, start + skip * i)) == NULL)
+			read_line = start + skip * rep * copy_size + (skip + 1) * i;
+
+			if((read_element = dynarr_get_element(document->lines_arr, read_line)) == NULL)
 				return print_error(RET_ERR_INTERNAL);
 
 			if((write_element = str_alloc_copy(*read_element)) == NULL)
