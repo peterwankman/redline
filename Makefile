@@ -24,7 +24,7 @@ $(OBJ)/parser.o \
 $(OBJ)/repl.o \
 $(OBJ)/util.o
 
-.PHONY: all, debug, clean, release, afl, $(SRC)/rev.h
+.PHONY: all, debug, verbose, clean, release, afl, $(SRC)/rev.h
 
 $(BIN)/fred: $(PIECES)	
 	$(CC) $(CFLAGS) -o $@ $^
@@ -49,6 +49,11 @@ debug:
 	rm -f $(OBJ)/*
 	make CFLAGS="$(CFLAGS_DEBUG)" $(BIN)/fred
 	cp $(BIN)/fred $(BIN)/fred-debug
+
+verbose:
+	rm -f $(OBJ)/*
+	make CFLAGS="$(CFLAGS_DEBUG) -DCHATTY_PARSER" $(BIN)/fred
+	cp $(BIN)/fred $(BIN)/fred-verbose
 
 release:
 	rm -f $(OBJ)/*
