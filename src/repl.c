@@ -7,9 +7,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#ifdef AFL_BUILD
-#include <time.h>
-#endif
 
 #include "leak.h"
 
