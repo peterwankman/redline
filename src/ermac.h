@@ -6,9 +6,9 @@
 #ifndef ERMAC_H_
 #define ERMAC_H_
 
+#define RET_NO					0
 #define RET_OK					1
 #define RET_YES					2
-#define RET_NO					3
 #define RET_MORE				4
 
 #define RET_ERR_INTERNAL		-1
