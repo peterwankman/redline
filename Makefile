@@ -64,4 +64,4 @@ release:
 afl:
 	rm -f $(OBJ)/*
 	make CC=$(AFL_CC) CFLAGS="$(CFLAGS_AFL)" $(BIN)/fred
-	cp $(BIN)/fred $(BIN)/afl-ed
+	cp $(BIN)/fred $(BIN)/fred-afl
