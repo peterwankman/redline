@@ -175,9 +175,9 @@ static edps_instr_t *instr_new(void) {
 
 /**/
 
-static int set_start_range(edps_instr_t *instr, const int line) {
+static int ps_set_start_range(edps_instr_t *instr, const int line) {
 #ifdef CHATTY_PARSER
-	printf("PARSER: set_start_range(%d)\n", line);
+	printf("PARSER: ps_set_start_range(%d)\n", line);
 #endif
 
 	if((instr->start_line != EDPS_NO_LINE) || (instr->only_line != EDPS_NO_LINE)) {
@@ -188,9 +188,9 @@ static int set_start_range(edps_instr_t *instr, const int line) {
 	return RET_OK;
 }
 
-static int set_end_range(edps_instr_t *instr, const int line) {
+static int ps_set_end_range(edps_instr_t *instr, const int line) {
 #ifdef CHATTY_PARSER
-	printf("PARSER: set_end_range(%d)\n", line);
+	printf("PARSER: ps_set_end_range(%d)\n", line);
 #endif
 
 	if((instr->end_line != EDPS_NO_LINE) || (instr->only_line != EDPS_NO_LINE)) {
@@ -201,9 +201,9 @@ static int set_end_range(edps_instr_t *instr, const int line) {
 	return RET_OK;
 }
 
-static int set_only_line(edps_instr_t *instr, const int line) {
+static int ps_set_only_line(edps_instr_t *instr, const int line) {
 #ifdef CHATTY_PARSER
-	printf("PARSER: set_only_line(%d)\n", line);
+	printf("PARSER: ps_set_only_line(%d)\n", line);
 #endif
 
 	if((instr->only_line != EDPS_NO_LINE) ||
@@ -216,9 +216,9 @@ static int set_only_line(edps_instr_t *instr, const int line) {
 	return RET_OK;
 }
 
-static int set_target(edps_instr_t *instr, const int line) {
+static int ps_set_target(edps_instr_t *instr, const int line) {
 #ifdef CHATTY_PARSER
-	printf("PARSER: set_target(%d)\n", line);
+	printf("PARSER: ps_set_target(%d)\n", line);
 #endif
 
 	if(instr->target_line != EDPS_NO_LINE) {
@@ -229,9 +229,9 @@ static int set_target(edps_instr_t *instr, const int line) {
 	return RET_OK;
 }
 
-static int set_repeat(edps_instr_t *instr, const int n) {
+static int ps_set_repeat(edps_instr_t *instr, const int n) {
 #ifdef CHATTY_PARSER
-	printf("PARSER: set_repeat(%d)\n", n);
+	printf("PARSER: ps_set_repeat(%d)\n", n);
 #endif
 
 	if(instr->repeat != 1) {
@@ -242,9 +242,9 @@ static int set_repeat(edps_instr_t *instr, const int n) {
 	return RET_OK;
 }
 
-static int set_command(edps_instr_t *instr, const edps_cmd_t command) {
+static int ps_set_command(edps_instr_t *instr, const edps_cmd_t command) {
 #ifdef CHATTY_PARSER
-	printf("PARSER: set_command(%d)\n", command);
+	printf("PARSER: ps_set_command(%d)\n", command);
 #endif
 
 	if(instr->command != EDPS_CMD_NONE) {
@@ -255,9 +255,9 @@ static int set_command(edps_instr_t *instr, const edps_cmd_t command) {
 	return RET_OK;
 }
 
-static int set_ask(edps_instr_t *instr) {
+static int ps_set_ask(edps_instr_t *instr) {
 #ifdef CHATTY_PARSER
-	printf("PARSER: set_ask()\n");
+	printf("PARSER: ps_set_ask()\n");
 #endif
 
 	if(instr->ask != 0) {
@@ -268,9 +268,9 @@ static int set_ask(edps_instr_t *instr) {
 	return RET_OK;
 }
 
-static int set_search(edps_instr_t *instr, const char *search_str) {
+static int ps_set_search(edps_instr_t *instr, const char *search_str) {
 #ifdef CHATTY_PARSER
-	printf("PARSER: set_search(\"%s\")\n", search_str);
+	printf("PARSER: ps_set_search(\"%s\")\n", search_str);
 #endif
 
 	if(instr->search_str != NULL) {
@@ -289,9 +289,9 @@ static int set_search(edps_instr_t *instr, const char *search_str) {
 	return RET_OK;
 }
 
-static int set_replace(edps_instr_t *instr, const char *replace_str) {
+static int ps_set_replace(edps_instr_t *instr, const char *replace_str) {
 #ifdef CHATTY_PARSER
-	printf("PARSER: set_replace(\"%s\")\n", replace_str);
+	printf("PARSER: ps_set_replace(\"%s\")\n", replace_str);
 #endif
 
 	if(instr->replace_str != NULL) {
@@ -310,9 +310,9 @@ static int set_replace(edps_instr_t *instr, const char *replace_str) {
 	return RET_OK;
 }
 
-static int set_filename(edps_instr_t *instr, const char *filename_str) {
+static int ps_set_filename(edps_instr_t *instr, const char *filename_str) {
 #ifdef CHATTY_PARSER
-	printf("PARSER: set_filename(\"%s\")\n", filename_str);
+	printf("PARSER: ps_set_filename(\"%s\")\n", filename_str);
 #endif
 
 	if(instr->filename != NULL) {
@@ -336,7 +336,7 @@ static int set_filename(edps_instr_t *instr, const char *filename_str) {
 static int ps_after_range(edps_ctx_t *ctx) {
 	edlx_token_t token;
 	char lookahead;
-	int status = RET_OK;
+	int status;
 
 #ifdef CHATTY_PARSER
 	printf("PARSER: ps_after_range()\n");
@@ -347,41 +347,54 @@ static int ps_after_range(edps_ctx_t *ctx) {
 
 	switch(lookahead) {
 		case ',':
-			edlx_step(ctx->edlx_ctx);
-			return ps_target_range(ctx);
+			if((status = edlx_step(ctx->edlx_ctx)) != RET_OK)
+				return status;
+			return ps_target(ctx);
 
 		case ';':
-			return set_command(ctx->instr, EDPS_CMD_EDIT);
+			return ps_set_command(ctx->instr, EDPS_CMD_EDIT);
 	}
 
-	edlx_step(ctx->edlx_ctx);
+	if((status = edlx_step(ctx->edlx_ctx)) != RET_OK)
+		return status;
 	token = edlx_get_token(ctx->edlx_ctx, &status);
+	if(status != RET_OK) return status;
 
 	switch(token) {
 		case EDLX_TOKEN_KW_APPEND:
-			status = set_command(ctx->instr, EDPS_CMD_APPEND);
+			status = ps_set_command(ctx->instr, EDPS_CMD_APPEND);
 			break;
 
 		case EDLX_TOKEN_KW_DELETE:
-			status = set_command(ctx->instr, EDPS_CMD_DELETE);
+			status = ps_set_command(ctx->instr, EDPS_CMD_DELETE);
 			break;
 
 		case EDLX_TOKEN_KW_INSERT:
-			status = set_command(ctx->instr, EDPS_CMD_INSERT);
+			status = ps_set_command(ctx->instr, EDPS_CMD_INSERT);
 			break;
 
 		case EDLX_TOKEN_KW_LIST:
-			status = set_command(ctx->instr, EDPS_CMD_LIST);
+			status = ps_set_command(ctx->instr, EDPS_CMD_LIST);
 			break;
 
 		case EDLX_TOKEN_KW_PAGE:
-			status = set_command(ctx->instr, EDPS_CMD_PAGE);
+			status = ps_set_command(ctx->instr, EDPS_CMD_PAGE);
 			break;
 
-		case EDLX_TOKEN_KW_ASK_REPLACE:
-		case EDLX_TOKEN_KW_REPLACE:
-			edlx_rewind(ctx->edlx_ctx);
-			status = ps_replace(ctx);
+		case EDLX_TOKEN_EOL:
+			status = ps_set_command(ctx->instr, EDPS_CMD_EDIT);
+			break;
+
+		case EDLX_TOKEN_KW_TRANSFER:
+			if((status = ps_set_command(ctx->instr, EDPS_CMD_TRANSFER)) != RET_OK)
+				break;
+			status = ps_transfer(ctx);
+			break;
+
+		case EDLX_TOKEN_KW_WRITE:
+			if((status = ps_set_command(ctx->instr, EDPS_CMD_WRITE)) != RET_OK)
+				break;
+			status = ps_write(ctx);
 			break;
 
 		case EDLX_TOKEN_KW_ASK_SEARCH:
@@ -390,19 +403,10 @@ static int ps_after_range(edps_ctx_t *ctx) {
 			status = ps_search(ctx);
 			break;
 
-		case EDLX_TOKEN_KW_TRANSFER:
-			set_command(ctx->instr, EDPS_CMD_TRANSFER);
-			status = ps_transfer(ctx);
-			break;
-
-		case EDLX_TOKEN_KW_WRITE:
-			set_command(ctx->instr, EDPS_CMD_WRITE);
-			status = ps_write(ctx);
-			break;
-
-		case EDLX_TOKEN_EOL:
-			set_command(ctx->instr, EDPS_CMD_EDIT);
-			status = RET_OK;
+		case EDLX_TOKEN_KW_ASK_REPLACE:
+		case EDLX_TOKEN_KW_REPLACE:
+			edlx_rewind(ctx->edlx_ctx);
+			status = ps_replace(ctx);
 			break;
 
 		default:
@@ -422,8 +426,7 @@ static int ps_copy(edps_ctx_t *ctx) {
 	if((status = edlx_get_required_token(ctx->edlx_ctx, EDLX_TOKEN_KW_COPY)) != RET_OK)
 		return status;
 
-	set_command(ctx->instr, EDPS_CMD_COPY);
-	return RET_OK;
+	return ps_set_command(ctx->instr, EDPS_CMD_COPY);
 }
 
 static int ps_move(edps_ctx_t *ctx) {
@@ -436,8 +439,7 @@ static int ps_move(edps_ctx_t *ctx) {
 	if((status = edlx_get_required_token(ctx->edlx_ctx, EDLX_TOKEN_KW_MOVE)) != RET_OK)
 		return status;
 
-	set_command(ctx->instr, EDPS_CMD_MOVE);
-	return RET_OK;
+	return ps_set_command(ctx->instr, EDPS_CMD_MOVE);
 }
 
 static int ps_range_end(edps_ctx_t *ctx) {
@@ -453,17 +455,20 @@ static int ps_range_end(edps_ctx_t *ctx) {
 	if((status = edlx_get_required_token(ctx->edlx_ctx, EDLX_TOKEN_DELIM_COMMA)) != RET_OK)
 		return status;
 
-	if((status = edlx_step(ctx->edlx_ctx)) != RET_OK) return status;
+	if((status = edlx_step(ctx->edlx_ctx)) != RET_OK)
+		return status;
 	token = edlx_get_token(ctx->edlx_ctx, &status);
+	if(status != RET_OK) return status;
+
 	lexeme = edlx_get_lexeme(ctx->edlx_ctx);
 
 	switch(token) {
 		case EDLX_TOKEN_THIS_LINE:
-			status = set_end_range(ctx->instr, EDPS_THIS_LINE);
+			status = ps_set_end_range(ctx->instr, EDPS_THIS_LINE);
 			break;
 
 		case EDLX_TOKEN_NUMBER:
-			status = set_end_range(ctx->instr, atoi(lexeme));
+			status = ps_set_end_range(ctx->instr, atoi(lexeme));
 			break;
 
 		case EDLX_TOKEN_KW_COPY:
@@ -475,15 +480,15 @@ static int ps_range_end(edps_ctx_t *ctx) {
 		case EDLX_TOKEN_KW_SEARCH:
 		case EDLX_TOKEN_KW_TRANSFER:
 			edlx_rewind(ctx->edlx_ctx);
-			status = ps_after_range(ctx);
-			if(status == RET_OK) cmd_parsed = 1;
+			if((status = ps_after_range(ctx)) == RET_OK)
+				cmd_parsed = 1;
 			break;
 
 		default:
 			status = RET_ERR_SYNTAX;
 	}
 
-	/* This is simple enough to check it in the parser. */
+	/* This is simple enough to check in the parser. */
 	if((ctx->instr->end_line > 0) && (ctx->instr->end_line < ctx->instr->start_line))
 		status = RET_ERR_SYNTAX;
 
@@ -504,28 +509,29 @@ static int ps_range_start(edps_ctx_t *ctx) {
 	printf("PARSER: ps_range_start()\n");
 #endif
 
-	if((status = edlx_step(ctx->edlx_ctx)) != RET_OK) return status;
+	if((status = edlx_step(ctx->edlx_ctx)) != RET_OK)
+		return status;
 	lexeme = edlx_get_lexeme(ctx->edlx_ctx);
 	token = edlx_get_token(ctx->edlx_ctx, &status);
 	if(status != RET_OK) return status;
 
 	/* If the line number isn't followed by a comma, it is the end of the range. */
-	if(edlx_get_lookahead(ctx->edlx_ctx, &status) != ',')
-		end_of_range = 1;
+	if(edlx_get_lookahead(ctx->edlx_ctx, &status) != ',') end_of_range = 1;
+	if(status != RET_OK) return status;
 
 	switch(token) {
 		case EDLX_TOKEN_THIS_LINE:
 			if(end_of_range == 0)
-				status = set_start_range(ctx->instr, EDPS_THIS_LINE);
+				status = ps_set_start_range(ctx->instr, EDPS_THIS_LINE);
 			else
-				status = set_only_line(ctx->instr, EDPS_THIS_LINE);
+				status = ps_set_only_line(ctx->instr, EDPS_THIS_LINE);
 			break;
 
 		case EDLX_TOKEN_NUMBER:
 			if(end_of_range == 0)
-				status = set_start_range(ctx->instr, atoi(lexeme));
+				status = ps_set_start_range(ctx->instr, atoi(lexeme));
 			else
-				status = set_only_line(ctx->instr, atoi(lexeme));
+				status = ps_set_only_line(ctx->instr, atoi(lexeme));
 			break;
 
 		default:
@@ -542,7 +548,6 @@ static int ps_range_start(edps_ctx_t *ctx) {
 }
 
 static int ps_repeat(edps_ctx_t *ctx) {
-	edlx_token_t token;
 	char *lexeme;
 	int status;
 
@@ -550,26 +555,10 @@ static int ps_repeat(edps_ctx_t *ctx) {
 	printf("PARSER: ps_repeat()\n");
 #endif
 
-	if((status = edlx_step(ctx->edlx_ctx)) != RET_OK)
+	if((status = edlx_get_required_token(ctx->edlx_ctx, EDLX_TOKEN_NUMBER)) != RET_OK)
 		return status;
-
-	token = edlx_get_token(ctx->edlx_ctx, &status);
 	lexeme = edlx_get_lexeme(ctx->edlx_ctx);
-
-	switch(token) {
-		case EDLX_TOKEN_THIS_LINE:
-			status = RET_ERR_SYNTAX;
-			break;
-
-		case EDLX_TOKEN_NUMBER:
-			status = set_repeat(ctx->instr, atoi(lexeme));
-			break;
-
-		default:
-			status = RET_ERR_SYNTAX;
-	}
-
-	if(status != RET_OK) return status;
+	status = ps_set_repeat(ctx->instr, atoi(lexeme));
 
 	return ps_copy(ctx);
 }
@@ -583,60 +572,65 @@ static int ps_replace(edps_ctx_t *ctx) {
 	printf("PARSER: ps_replace()\n");
 #endif
 
-	edlx_step(ctx->edlx_ctx);
+	if((status = edlx_step(ctx->edlx_ctx)) != RET_OK)
+		return status;
 	token = edlx_get_token(ctx->edlx_ctx, &status);
 
 	switch(token) {
 		case EDLX_TOKEN_KW_ASK_REPLACE:
-			set_ask(ctx->instr);
+			if((status = ps_set_ask(ctx->instr)) != RET_OK)
+				return status;
 		case EDLX_TOKEN_KW_REPLACE:
-			set_command(ctx->instr, EDPS_CMD_REPLACE);
-			status = RET_OK;
+			status = ps_set_command(ctx->instr, EDPS_CMD_REPLACE);
 			break;
 
 		default:
-			fprintf(stderr, "edlin: Internal parser error.\n");
-			status = RET_ERR_INTERNAL;
+			status = RET_ERR_PARSER;
 	}
 
 	if(status != RET_OK) return status;
 
-	edlx_step(ctx->edlx_ctx);
+	if((status = edlx_step(ctx->edlx_ctx)) != RET_OK)
+		return status;
 	token = edlx_get_token(ctx->edlx_ctx, &status);
+	if(status != RET_OK) return status;
 
 	switch(token) {
-		/* If the search string is skipped, make it the empty string */
+		/* If the search string is omitted, make it the empty string */
 		case EDLX_TOKEN_DELIM_COMMA:
-			set_search(ctx->instr, "");
+			if((status = ps_set_search(ctx->instr, "")) != RET_OK)
+				return status;
 			edlx_rewind(ctx->edlx_ctx);
 			break;
 
 		case EDLX_TOKEN_STRING:
 			lexeme = edlx_get_lexeme(ctx->edlx_ctx);
-			set_search(ctx->instr, lexeme);
+			if((status = ps_set_search(ctx->instr, lexeme)) != RET_OK)
+				return status;
 			break;
 	}
 
 	if((status = edlx_get_required_token(ctx->edlx_ctx, EDLX_TOKEN_DELIM_COMMA)) != RET_OK)
 		return status;
 
-	edlx_step(ctx->edlx_ctx);
+	if((status = edlx_step(ctx->edlx_ctx)) != RET_OK)
+		return status;
 	token = edlx_get_token(ctx->edlx_ctx, &status);
 
 	switch(token) {
 		case EDLX_TOKEN_STRING:
 			lexeme = edlx_get_lexeme(ctx->edlx_ctx);
-			status = set_replace(ctx->instr, lexeme);
+			status = ps_set_replace(ctx->instr, lexeme);
 			break;
 
 		case EDLX_TOKEN_DELIM_COMMA:
 		case EDLX_TOKEN_EOL:
 			edlx_rewind(ctx->edlx_ctx);
-			status = set_replace(ctx->instr, "");
+			status = ps_set_replace(ctx->instr, "");
 			break;
 
 		default:
-			return RET_ERR_SYNTAX;
+			status = RET_ERR_SYNTAX;
 	}
 
 	return status;
@@ -651,12 +645,15 @@ static int ps_search(edps_ctx_t *ctx) {
 	printf("PARSER: ps_search()\n");
 #endif
 
-	edlx_step(ctx->edlx_ctx);
+	if((status = edlx_step(ctx->edlx_ctx)) != RET_OK)
+		return status;
 	token = edlx_get_token(ctx->edlx_ctx, &status);
+	if(status != RET_OK) return status;
 
 	switch(token) {
 		case EDLX_TOKEN_KW_ASK_SEARCH:
-			set_ask(ctx->instr);
+			if((status = ps_set_ask(ctx->instr)) != RET_OK)
+				return status;
 
 		case EDLX_TOKEN_KW_SEARCH:
 			if((lookahead = edlx_get_lookahead(ctx->edlx_ctx, &status)) == '\"') {
@@ -667,14 +664,14 @@ static int ps_search(edps_ctx_t *ctx) {
 				lexeme = NULL;
 			}
 
-			set_search(ctx->instr, lexeme);
-			set_command(ctx->instr, EDPS_CMD_SEARCH);
-			status = RET_OK;
+			if((status = ps_set_search(ctx->instr, lexeme)) != RET_OK)
+				return status;
+			if((status = ps_set_command(ctx->instr, EDPS_CMD_SEARCH)) != RET_OK)
+				return status;
 			break;
 
 		default:
-			fprintf(stderr, "edlin: Internal parser error.\n");
-			status = RET_ERR_INTERNAL;
+			status = RET_ERR_PARSER;
 	}
 
 	return status;
@@ -688,20 +685,22 @@ static int ps_standalone_cmd(edps_ctx_t *ctx) {
 	printf("PARSER: ps_standalone_cmd()\n");
 #endif
 
-	if((status = edlx_step(ctx->edlx_ctx)) != RET_OK) return status;
+	if((status = edlx_step(ctx->edlx_ctx)) != RET_OK)
+		return status;
 	token = edlx_get_token(ctx->edlx_ctx, &status);
+	if(status != RET_OK) return status;
 
 	switch(token) {
 		case EDLX_TOKEN_KW_ASK:
-			status = set_command(ctx->instr, EDPS_CMD_ASK);
+			status = ps_set_command(ctx->instr, EDPS_CMD_ASK);
 			break;
 
 		case EDLX_TOKEN_KW_END:
-			status = set_command(ctx->instr, EDPS_CMD_END);
+			status = ps_set_command(ctx->instr, EDPS_CMD_END);
 			break;
 
 		case EDLX_TOKEN_KW_QUIT:
-			status = set_command(ctx->instr, EDPS_CMD_QUIT);
+			status = ps_set_command(ctx->instr, EDPS_CMD_QUIT);
 			break;
 	}
 
@@ -718,10 +717,13 @@ static int ps_statement(edps_ctx_t *ctx) {
 #endif
 
 	lookahead = edlx_get_lookahead(ctx->edlx_ctx, &status);
+	if(status != RET_OK) return status;
 	if(lookahead == ';') return edlx_step(ctx->edlx_ctx);
 
-	if((status = edlx_step(ctx->edlx_ctx)) != RET_OK) return status;
+	if((status = edlx_step(ctx->edlx_ctx)) != RET_OK)
+		return status;
 	token = edlx_get_token(ctx->edlx_ctx, &status);
+	if(status != RET_OK) return status;
 
 	switch(token) {
 		case EDLX_TOKEN_THIS_LINE:
@@ -777,8 +779,10 @@ static int ps_statement(edps_ctx_t *ctx) {
 
 	if(status != RET_OK) return status;
 
-	edlx_step(ctx->edlx_ctx);
+	if((status = edlx_step(ctx->edlx_ctx)) != RET_OK)
+		return status;
 	token = edlx_get_token(ctx->edlx_ctx, &status);
+	if(status != RET_OK) return status;
 
 	switch(token) {
 		case EDLX_TOKEN_DELIM_SEMICOLON:
@@ -795,28 +799,29 @@ static int ps_statement(edps_ctx_t *ctx) {
 	return status;
 }
 
-static int ps_target_range(edps_ctx_t *ctx) {
+static int ps_target(edps_ctx_t *ctx) {
 	edlx_token_t token;
 	char *lexeme;
 	int status;
 
 #ifdef CHATTY_PARSER
-	printf("PARSER: ps_target_range()\n");
+	printf("PARSER: ps_target()\n");
 #endif
 
 	if((status = edlx_step(ctx->edlx_ctx)) != RET_OK)
 		return status;
 
 	token = edlx_get_token(ctx->edlx_ctx, &status);
+	if(status != RET_OK) return status;
 	lexeme = edlx_get_lexeme(ctx->edlx_ctx);
 
 	switch(token) {
 		case EDLX_TOKEN_THIS_LINE:
-			status = set_target(ctx->instr, EDPS_THIS_LINE);
+			status = ps_set_target(ctx->instr, EDPS_THIS_LINE);
 			break;
 
 		case EDLX_TOKEN_NUMBER:
-			status = set_target(ctx->instr, atoi(lexeme));
+			status = ps_set_target(ctx->instr, atoi(lexeme));
 			break;
 
 		default:
@@ -825,8 +830,10 @@ static int ps_target_range(edps_ctx_t *ctx) {
 
 	if(status != RET_OK) return status;
 
-	edlx_step(ctx->edlx_ctx);
+	if((status = edlx_step(ctx->edlx_ctx)) != RET_OK)
+		return status;
 	token = edlx_get_token(ctx->edlx_ctx, &status);
+	if(status != RET_OK) return status;
 
 	switch(token) {
 		case EDLX_TOKEN_DELIM_COMMA:
@@ -851,29 +858,17 @@ static int ps_target_range(edps_ctx_t *ctx) {
 }
 
 static int ps_transfer(edps_ctx_t *ctx) {
-	edlx_token_t token;
 	char *lexeme;
-	int status = RET_ERR_INTERNAL;
+	int status;
 
 #ifdef CHATTY_PARSER
 	printf("PARSER: ps_transfer()\n");
 #endif
 
-	edlx_step(ctx->edlx_ctx);
-	token = edlx_get_token(ctx->edlx_ctx, &status);
-
-	switch(token) {
-		case EDLX_TOKEN_STRING:
-			lexeme = edlx_get_lexeme(ctx->edlx_ctx);
-			set_filename(ctx->instr, lexeme);
-			status = RET_OK;
-			break;
-
-		default:
-			return RET_ERR_SYNTAX;
-	}
-
-	return status;
+	if((status = edlx_get_required_token(ctx->edlx_ctx, EDLX_TOKEN_STRING)) != RET_OK)
+		return status;
+	lexeme = edlx_get_lexeme(ctx->edlx_ctx);
+	return ps_set_filename(ctx->instr, lexeme);
 }
 
 static int ps_write(edps_ctx_t *ctx) {
@@ -890,14 +885,15 @@ static int ps_write(edps_ctx_t *ctx) {
 
 	if(lookahead == ';') return RET_OK;
 
-	edlx_step(ctx->edlx_ctx);
+	if((status = edlx_step(ctx->edlx_ctx)) != RET_OK)
+		return status;
 	token = edlx_get_token(ctx->edlx_ctx, &status);
+	if(status != RET_OK) return status;
 
 	switch(token) {
 		case EDLX_TOKEN_STRING:
 			lexeme = edlx_get_lexeme(ctx->edlx_ctx);
-			set_filename(ctx->instr, lexeme);
-			status = RET_OK;
+			status = ps_set_filename(ctx->instr, lexeme);
 			break;
 
 		case EDLX_TOKEN_EOL:
@@ -928,8 +924,11 @@ int edps_parse(edps_ctx_t *ctx) {
 #ifdef CHATTY_PARSER
 	print_instr(ctx->instr);
 #endif
-	edlx_step(ctx->edlx_ctx);
+	if((status = edlx_step(ctx->edlx_ctx)) != RET_OK)
+		return status;
 	token = edlx_get_token(ctx->edlx_ctx, &status);
+	if(status != RET_OK) return status;
+
 	if(token == EDLX_TOKEN_EOL)
 		return RET_OK;
 

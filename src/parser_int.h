@@ -25,7 +25,7 @@ static int ps_replace(edps_ctx_t *ctx);
 static int ps_search(edps_ctx_t *ctx);
 static int ps_standalone_cmd(edps_ctx_t *ctx);
 static int ps_statement(edps_ctx_t *ctx);
-static int ps_target_range(edps_ctx_t *ctx);
+static int ps_target(edps_ctx_t *ctx);
 static int ps_transfer(edps_ctx_t *ctx);
 static int ps_write(edps_ctx_t *ctx);
 
