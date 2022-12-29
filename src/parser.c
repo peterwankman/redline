@@ -575,6 +575,7 @@ static int ps_replace(edps_ctx_t *ctx) {
 	if((status = edlx_step(ctx->edlx_ctx)) != RET_OK)
 		return status;
 	token = edlx_get_token(ctx->edlx_ctx, &status);
+	if(status != RET_OK) return status;
 
 	switch(token) {
 		case EDLX_TOKEN_KW_ASK_REPLACE:
@@ -616,6 +617,7 @@ static int ps_replace(edps_ctx_t *ctx) {
 	if((status = edlx_step(ctx->edlx_ctx)) != RET_OK)
 		return status;
 	token = edlx_get_token(ctx->edlx_ctx, &status);
+	if(status != RET_OK) return status;
 
 	switch(token) {
 		case EDLX_TOKEN_STRING:

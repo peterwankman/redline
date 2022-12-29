@@ -270,6 +270,9 @@ static int copy(repl_state_t *state, ed_doc_t *document, edps_instr_t *instr) {
 	start = instr->start_line;
 	end = instr->end_line;
 
+	if((start >= document->n_lines) || (end >= document->n_lines))
+		return print_error(RET_ERR_RANGE);
+
 	if((target > start) && (target <= end))
 		return print_error(RET_ERR_RANGE);
 
@@ -548,7 +551,7 @@ static int move(repl_state_t *state, ed_doc_t *document, edps_instr_t *instr) {
 	start = instr->start_line;
 	end = instr->end_line;
 
-	if((start > document->n_lines) || (end > document->n_lines))
+	if((start >= document->n_lines) || (end >= document->n_lines))
 		return print_error(RET_ERR_RANGE);
 
 	if((target >= start) && (target <= end))
