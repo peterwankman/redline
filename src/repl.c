@@ -860,7 +860,7 @@ static int transfer(repl_state_t *state, ed_doc_t *document, edps_instr_t *instr
 	if((fp = fopen(instr->filename, "r")) == NULL)
 		return print_error(RET_ERR_OPEN);
 
-	if((new_doc = load_doc(fp, NULL)) == NULL) {
+	if((new_doc = load_doc(fp, NULL, 1)) == NULL) {
 		fclose(fp);
 		return print_error(RET_ERR_READ);
 	}
@@ -943,6 +943,9 @@ int save_doc(ed_doc_t *doc, const char *filename, const uint32_t start_line, con
 	if(doc == NULL)
 		return print_error(RET_ERR_INVALID);
 
+	if(doc->no_write != 0)
+		return print_error(RET_ERR_NOWRITE);
+
 	if(out_filename == NULL)
 		if((out_filename = doc->filename) == NULL)
 			return print_error(RET_ERR_INVALID);
@@ -980,7 +983,7 @@ int save_doc(ed_doc_t *doc, const char *filename, const uint32_t start_line, con
 	return RET_OK;
 }
 
-ed_doc_t *load_doc(FILE *fp, const char *filename) {
+ed_doc_t *load_doc(FILE *fp, const char *filename, const int no_write) {
 	ed_doc_t *out;
 	uint8_t *read_line;
 	uint32_t line_number = 0, line_pos;
@@ -1012,6 +1015,7 @@ ed_doc_t *load_doc(FILE *fp, const char *filename) {
 		goto fail;
 	}
 
+	out->no_write = no_write;
 	return out;
 fail:
 	dynarr_free(out->lines_arr);

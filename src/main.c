@@ -46,12 +46,13 @@ int main(int argc, char **argv) {
 	char *cursor = NULL;
 	ed_doc_t *document;
 	FILE *fp;
+	int no_write = 0;
 #ifdef AFL_BUILD
 	char *input_line;
 	FILE *afl_fp;
 #endif
 
-	while((i = getopt(argc, argv, "bc:hp:v")) != -1) {
+	while((i = getopt(argc, argv, "bc:hnp:v")) != -1) {
 		switch(i) {
 			case 'b':
 				ignore_eof = 1;
@@ -64,6 +65,10 @@ int main(int argc, char **argv) {
 			case 'h':
 				usage(argv[0]);
 				return EXIT_SUCCESS;
+
+			case 'n':
+				no_write = 1;
+				break;
 
 			case 'p':
 				prompt = optarg;
@@ -107,7 +112,7 @@ int main(int argc, char **argv) {
 		printf("New file\n");
 		document = empty_doc(filename);
 	} else {
-		if((document = load_doc(fp, filename)) == NULL) return EXIT_FAILURE;
+		if((document = load_doc(fp, filename, no_write)) == NULL) return EXIT_FAILURE;
 		fclose(fp);
 	}
 

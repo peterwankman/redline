@@ -51,6 +51,7 @@ char *str_error(const int err_no) {
 		case RET_ERR_OPEN:		return str_alloc_copy("Open failed");
 		case RET_ERR_READ:		return str_alloc_copy("Read error");
 		case RET_ERR_WRITE:		return str_alloc_copy("Write error");
+		case RET_ERR_NOWRITE:	return str_alloc_copy("Write protected");
 		case RET_ERR_LEXER:		return str_alloc_copy("Internal lexer error");
 		case RET_ERR_PARSER:	return str_alloc_copy("Internal parser error");
 		case RET_ERR_DOUBLE:	return str_alloc_copy("Double fault");
@@ -73,7 +74,7 @@ int print_error(const int err_no) {
 		}
 #endif
 	} else {
-		fprintf(stderr, "Double fault. bx_strerror() failed.\n");
+		fprintf(stderr, "Double fault. str_error() failed.\n");
 		return RET_ERR_DOUBLE;
 	}
 
