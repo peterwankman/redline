@@ -180,6 +180,8 @@ static int ps_set_start_range(edps_instr_t *instr, const int line) {
 	printf("PARSER: ps_set_start_range(%d)\n", line);
 #endif
 
+	if(line == 0) return RET_ERR_SYNTAX;
+
 	if((instr->start_line != EDPS_NO_LINE) || (instr->only_line != EDPS_NO_LINE)) {
 		fprintf(stderr, "Parser: Encountered multiple ranges.\n");
 		return print_error(RET_ERR_PARSER);
@@ -193,6 +195,8 @@ static int ps_set_end_range(edps_instr_t *instr, const int line) {
 	printf("PARSER: ps_set_end_range(%d)\n", line);
 #endif
 
+	if(line == 0) return RET_ERR_SYNTAX;
+
 	if((instr->end_line != EDPS_NO_LINE) || (instr->only_line != EDPS_NO_LINE)) {
 		fprintf(stderr, "Parser: Encountered multiple ranges.\n");
 		return print_error(RET_ERR_PARSER);
@@ -205,6 +209,8 @@ static int ps_set_only_line(edps_instr_t *instr, const int line) {
 #ifdef CHATTY_PARSER
 	printf("PARSER: ps_set_only_line(%d)\n", line);
 #endif
+
+	if(line == 0) return RET_ERR_SYNTAX;
 
 	if((instr->only_line != EDPS_NO_LINE) ||
 	   (instr->start_line != EDPS_NO_LINE) ||
@@ -221,6 +227,8 @@ static int ps_set_target(edps_instr_t *instr, const int line) {
 	printf("PARSER: ps_set_target(%d)\n", line);
 #endif
 
+	if(line == 0) return RET_ERR_SYNTAX;
+
 	if(instr->target_line != EDPS_NO_LINE) {
 		fprintf(stderr, "Parser: Encountered multiple targets.\n");
 		return print_error(RET_ERR_PARSER);
@@ -233,6 +241,8 @@ static int ps_set_repeat(edps_instr_t *instr, const int n) {
 #ifdef CHATTY_PARSER
 	printf("PARSER: ps_set_repeat(%d)\n", n);
 #endif
+
+	if(n == 0) return RET_ERR_SYNTAX;
 
 	if(instr->repeat != 1) {
 		fprintf(stderr, "Parser: Encountered multiple repetitions.\n");
@@ -489,7 +499,7 @@ static int ps_range_end(edps_ctx_t *ctx) {
 	}
 
 	/* This is simple enough to check in the parser. */
-	if((ctx->instr->end_line > 0) && (ctx->instr->end_line < ctx->instr->start_line))
+	if((ctx->instr->end_line > -1) && (ctx->instr->end_line < ctx->instr->start_line))
 		status = RET_ERR_SYNTAX;
 
 	if(status != RET_OK) return status;

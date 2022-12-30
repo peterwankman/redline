@@ -164,12 +164,14 @@ static int classify_range(const edps_instr_t *instr) {
 	return RANGE_CLASS_ERROR;
 }
 
-static void resolve_range(repl_state_t *state, edps_instr_t *instr) {
+static int resolve_lines(repl_state_t *state, edps_instr_t *instr) {
 #ifdef CHATTY_PARSER
 	uint8_t n_subs = 0;
 	const uint8_t sub_only = 0x01;
 	const uint8_t sub_start = 0x02;
 	const uint8_t sub_end = 0x04;
+	const uint8_t sub_target = 0x08;
+
 #endif
 	if(instr->only_line == EDPS_THIS_LINE) {
 		instr->only_line = state->cursor;
@@ -192,19 +194,35 @@ static void resolve_range(repl_state_t *state, edps_instr_t *instr) {
 #endif
 	}
 
+	if(instr->target_line == EDPS_THIS_LINE) {
+		instr->target_line = state->cursor;
 #ifdef CHATTY_PARSER
-	printf("Range resolver: ");
+		n_subs |= sub_target;
+#endif
+	}
+
+#ifdef CHATTY_PARSER
+	printf("Resolver:");
 	if(n_subs > 0) {
 		if(n_subs & sub_only)
-			printf(" Line %d\n", instr->only_line + 1);
+			printf(" Line %d", instr->only_line + 1);
 
 		if((n_subs & sub_start) || (n_subs & sub_end))
-			printf(" Range From %d to %d\n",
+			printf(" Range From %d to %d",
 				instr->start_line + 1, instr->end_line + 1);
+
+		if(n_subs & sub_target)
+			printf(" Target %d", instr->target_line + 1);
+
+		printf("\n");
 	} else {
 		printf("No substitutions.\n");
 	}
 #endif
+
+	if(instr->end_line < instr->start_line)
+		return RET_ERR_SYNTAX;
+	return RET_OK;
 }
 
 /**/
@@ -266,9 +284,12 @@ static int copy(repl_state_t *state, ed_doc_t *document, edps_instr_t *instr) {
 
 	if(document->n_lines == 0) return print_error(RET_ERR_RANGE);
 
-	resolve_range(state, instr);
+	if((status = resolve_lines(state, instr)) != RET_OK)
+		return status;
+
 	start = instr->start_line;
 	end = instr->end_line;
+	target = instr->target_line;
 
 	if((start >= document->n_lines) || (end >= document->n_lines))
 		return print_error(RET_ERR_RANGE);
@@ -306,8 +327,10 @@ static int delete(repl_state_t *state, ed_doc_t *document, edps_instr_t *instr) 
 
 	if(document->n_lines == 0) return RET_OK;
 
-	resolve_range(state, instr);
+	if((status = resolve_lines(state, instr)) != RET_OK)
+		return status;
 	range_class = classify_range(instr);
+
 	switch(range_class) {
 		case RANGE_CLASS_NONE:
 			start = state->cursor;
@@ -399,8 +422,10 @@ static int insert(repl_state_t *state, ed_doc_t *document, edps_instr_t *instr) 
 	char *read_line;
 	int range_class, status, goon = 1;
 
-	resolve_range(state, instr);
+	if((status = resolve_lines(state, instr)) != RET_OK)
+		return status;
 	range_class = classify_range(instr);
+
 	switch(range_class) {
 		case RANGE_CLASS_NONE:
 			l = state->cursor;
@@ -547,9 +572,12 @@ static int move(repl_state_t *state, ed_doc_t *document, edps_instr_t *instr) {
 	uint32_t move_range;
 	int status;
 
-	resolve_range(state, instr);
+	if((status = resolve_lines(state, instr)) != RET_OK)
+		return status;
+
 	start = instr->start_line;
 	end = instr->end_line;
+	target = instr->target_line;
 
 	if((start >= document->n_lines) || (end >= document->n_lines))
 		return print_error(RET_ERR_RANGE);
@@ -572,7 +600,7 @@ static int move(repl_state_t *state, ed_doc_t *document, edps_instr_t *instr) {
 static int page(repl_state_t *state, ed_doc_t *document, edps_instr_t *instr) {
 	uint32_t start, end;
 	uint32_t i, lines_shown = 0;
-	int range_class;
+	int range_class, status;
 	char **line;
 
 	if(document->n_lines == 0) return RET_OK;
@@ -594,8 +622,10 @@ static int page(repl_state_t *state, ed_doc_t *document, edps_instr_t *instr) {
 	*		(,#P): start = cursor + 1; end = #
 	*/
 
-	resolve_range(state, instr);
+	if((status = resolve_lines(state, instr)) != RET_OK)
+		return status;
 	range_class = classify_range(instr);
+
 	switch(range_class) {
 		case RANGE_CLASS_NONE:
 			if(state->cursor == 0) {
@@ -841,8 +871,10 @@ static int transfer(repl_state_t *state, ed_doc_t *document, edps_instr_t *instr
 	int status;
 	int range_class;
 
-	resolve_range(state, instr);
+	if((status = resolve_lines(state, instr)) != RET_OK)
+		return status;
 	range_class = classify_range(instr);
+
 	switch(range_class) {
 		case RANGE_CLASS_SINGLELINE:
 			insert_line = instr->only_line;
