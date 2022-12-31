@@ -24,9 +24,44 @@ $(OBJ)/parser.o \
 $(OBJ)/repl.o \
 $(OBJ)/util.o
 
-.PHONY: all, debug, verbose, clean, release, afl, $(SRC)/rev.h
+.PHONY: all, debug, release, clean, $(SRC)/rev.h
 
-$(BIN)/fred: $(PIECES)	
+release:
+	make $(BIN)/edison-release
+	mv $(BIN)/edison-release $(BIN)/edison
+
+debug:
+	make $(BIN)/edison-debug
+	mv $(BIN)/edison-debug $(BIN)/edison
+
+all:
+	make $(BIN)/edison-afl
+	make $(BIN)/edison-debug
+	make $(BIN)/edison-release
+	make $(BIN)/edison-verbose
+
+$(BIN)/edison-afl:
+	rm -f $(OBJ)/*
+	make CC=$(AFL_CC) CFLAGS="$(CFLAGS_AFL)" $(BIN)/edison
+	mv $(BIN)/edison $(BIN)/edison-afl
+
+$(BIN)/edison-debug:
+	rm -f $(OBJ)/*
+	make CFLAGS="$(CFLAGS_DEBUG)" $(BIN)/edison
+	mv $(BIN)/edison $(BIN)/edison-debug
+
+$(BIN)/edison-release:
+	rm -f $(OBJ)/*
+	make CFLAGS="$(CFLAGS_RELEASE)" $(BIN)/edison
+	mv $(BIN)/edison $(BIN)/edison-release
+	strip $(BIN)/edison-release
+
+$(BIN)/edison-verbose:
+	rm -f $(OBJ)/*
+	make CFLAGS="$(CFLAGS_DEBUG) -DCHATTY_PARSER" $(BIN)/edison
+	mv $(BIN)/edison $(BIN)/edison-verbose
+
+$(BIN)/edison: $(PIECES)
 	$(CC) $(CFLAGS) -o $@ $^
 
 $(OBJ)/%.o: $(SRC)/%.c
@@ -35,33 +70,7 @@ $(OBJ)/%.o: $(SRC)/%.c
 $(SRC)/rev.h: scripts/mkrevh.sh
 	scripts/mkrevh.sh > $@
 
-all:
-	make debug
-	make release
-	make afl
-
 clean:
 	rm -f $(OBJ)/*
 	rm -f $(BIN)/*
 	rm -f $(SRC)/rev.h
-
-debug:
-	rm -f $(OBJ)/*
-	make CFLAGS="$(CFLAGS_DEBUG)" $(BIN)/fred
-	cp $(BIN)/fred $(BIN)/fred-debug
-
-verbose:
-	rm -f $(OBJ)/*
-	make CFLAGS="$(CFLAGS_DEBUG) -DCHATTY_PARSER" $(BIN)/fred
-	cp $(BIN)/fred $(BIN)/fred-verbose
-
-release:
-	rm -f $(OBJ)/*
-	make CFLAGS="$(CFLAGS_RELEASE)" $(BIN)/fred
-	cp $(BIN)/fred $(BIN)/fred-release
-	strip $(BIN)/fred-release
-
-afl:
-	rm -f $(OBJ)/*
-	make CC=$(AFL_CC) CFLAGS="$(CFLAGS_AFL)" $(BIN)/fred
-	cp $(BIN)/fred $(BIN)/fred-afl
