@@ -968,9 +968,9 @@ int save_doc(ed_doc_t *doc, const char *filename, const uint32_t start_line, con
 	FILE *fp;
 	const char *out_filename = filename;
 	uint32_t n_lines, curr_line;
-	size_t pos, bytes_written, to_write;
+	size_t pos, bytes_written, to_write, tmp_size;
 	int fix_line = 0;
-	char **line_data;
+	char **line_data, *tmp_line;
 
 	if(doc == NULL)
 		return print_error(RET_ERR_INVALID);
@@ -998,15 +998,28 @@ int save_doc(ed_doc_t *doc, const char *filename, const uint32_t start_line, con
 		line_data = dynarr_get_element(doc->lines_arr, curr_line);
 
 		if(line_data != NULL) {
-			to_write = strlen(*line_data);
+			tmp_size = strlen(*line_data);
+			if((tmp_line = malloc(tmp_size + 1)) == NULL)
+				return print_error(RET_ERR_WRITE);
+
+			memset(tmp_line, 0, tmp_size);
+			memcpy(tmp_line, *line_data, tmp_size);
+
+			if(curr_line < n_lines - 1) {
+				tmp_line[tmp_size] = '\n';
+				to_write = tmp_size + 1;
+			} else {
+				to_write = tmp_size;
+			}
+
 			pos = 0;
 
 			while(to_write > 0) {
-				bytes_written = fwrite(*(line_data + pos), 1, to_write, fp);
+				bytes_written = fwrite(tmp_line, 1, to_write, fp);
 				pos += bytes_written;
 				to_write -= bytes_written;
 			}
-			fputc('\n', fp);
+			free(tmp_line);
 		}
 	}
 
