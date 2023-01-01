@@ -5,3 +5,4 @@ dump
 *.edl
 afl-in
 afl-out
+crashes
