@@ -6,7 +6,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "leak.h"
+#include "mem.h"
 
 char *optarg;
 int optind = 1, opterr = 1, optopt = '\0';

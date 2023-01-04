@@ -334,6 +334,8 @@ popd</Command>
     <ClCompile Include="..\..\src\dynarr.c" />
     <ClCompile Include="..\..\src\main.c" />
     <ClCompile Include="..\..\src\lexer.c" />
+    <ClCompile Include="..\..\src\mem.c" />
+    <ClCompile Include="..\..\src\mem_bst.c" />
     <ClCompile Include="..\..\src\parser.c" />
     <ClCompile Include="..\..\src\repl.c" />
     <ClCompile Include="..\..\src\getopt.c" />
@@ -343,8 +345,9 @@ popd</Command>
   <ItemGroup>
     <ClInclude Include="..\..\src\dynarr.h" />
     <ClInclude Include="..\..\src\ermac.h" />
-    <ClInclude Include="..\..\src\leak.h" />
     <ClInclude Include="..\..\src\lexer.h" />
+    <ClInclude Include="..\..\src\mem.h" />
+    <ClInclude Include="..\..\src\mem_bst.h" />
     <ClInclude Include="..\..\src\parser.h" />
     <ClInclude Include="..\..\src\parser_int.h" />
     <ClInclude Include="..\..\src\repl.h" />

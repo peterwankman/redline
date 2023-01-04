@@ -35,6 +35,12 @@
     <ClCompile Include="..\..\src\ermac.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\mem.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\mem_bst.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\getopt.h">
@@ -67,7 +73,10 @@
     <ClInclude Include="..\..\src\rev.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\leak.h">
+    <ClInclude Include="..\..\src\mem.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\mem_bst.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

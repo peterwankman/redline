@@ -3,14 +3,13 @@
  * Copyright (C) 2022-2023  Martin Wolters *
  *******************************************/
 
-
 #include <ctype.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-#include "leak.h"
+#include "mem.h"
 
 #include "ermac.h"
 #include "lexer.h"

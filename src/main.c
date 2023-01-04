@@ -9,7 +9,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "leak.h"
+#include "mem.h"
 
 #include "appinfo.h"
 #include "ermac.h"
@@ -119,8 +119,9 @@ int main(int argc, char **argv) {
 	repl_main(stdin, document, prompt, cursor);
 	free_doc(document);
 
-#if defined _DEBUG && defined _WIN32
-	_CrtDumpMemoryLeaks();
+
+#if defined _DEBUG
+	mem_summary(stderr, RET_YES);
 #endif
 
 	return EXIT_SUCCESS;

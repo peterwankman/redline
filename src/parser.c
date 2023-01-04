@@ -7,7 +7,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "leak.h"
+#include "mem.h"
 
 #include "ermac.h"
 #include "lexer.h"

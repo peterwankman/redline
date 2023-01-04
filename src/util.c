@@ -15,7 +15,7 @@
 #include <io.h>
 #endif
 
-#include "leak.h"
+#include "mem.h"
 
 #include "ermac.h"
 
