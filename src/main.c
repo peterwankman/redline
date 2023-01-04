@@ -1,7 +1,7 @@
-/*****************************************
- * SPDX-License-Identifier: GPL-2.0-only *
- *  Copyright (C) 2022  Martin Wolters   *
- *****************************************/
+/*******************************************
+ *  SPDX-License-Identifier: GPL-2.0-only  *
+ * Copyright (C) 2022-2023  Martin Wolters *
+ *******************************************/
 
 #include <ctype.h>
 #include <stdint.h>
@@ -24,7 +24,7 @@
 #endif
 
 static void print_version(void) {
-	printf("%s, version %d.%d.%d, Copyright (C) 2022 Martin Wolters.\n",
+	printf("%s, version %d.%d.%d, Copyright (C) 2022,2023 Martin Wolters.\n",
 		APP_NAME, APP_VER_MAJOR, APP_VER_MINOR, APP_VER_REV);
 	printf("Licensed under the terms of the GNU General Public License.\n");
 	printf("(Version 2.0 of the license only.)\n");

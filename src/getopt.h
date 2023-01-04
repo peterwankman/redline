@@ -1,6 +1,6 @@
 /*******************************************
- * SPDX-License-Identifier: GPL-2.0-only   *
- * Copyright (C) 2015-2021  Martin Wolters *
+ *  SPDX-License-Identifier: GPL-2.0-only  *
+ * Copyright (C) 2022-2023  Martin Wolters *
  *******************************************/
 
 #ifndef GETOPT_H_

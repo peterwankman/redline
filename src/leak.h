@@ -1,7 +1,7 @@
-/*****************************************
- * SPDX-License-Identifier: GPL-2.0-only *
- *  Copyright (C) 2022  Martin Wolters   *
- *****************************************/
+/*******************************************
+ *  SPDX-License-Identifier: GPL-2.0-only  *
+ * Copyright (C) 2022-2023  Martin Wolters *
+ *******************************************/
 
 #ifndef LEAK_H_
 #define LEAK_H_

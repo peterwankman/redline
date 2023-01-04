@@ -1,7 +1,7 @@
-/*****************************************
- * SPDX-License-Identifier: GPL-2.0-only *
- *  Copyright (C) 2022  Martin Wolters   *
- *****************************************/
+/*******************************************
+ *  SPDX-License-Identifier: GPL-2.0-only  *
+ * Copyright (C) 2022-2023  Martin Wolters *
+ *******************************************/
 
 #ifdef _WIN32
 #define WIN32_LEAN_AND_MEAN
