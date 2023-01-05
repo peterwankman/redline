@@ -121,11 +121,22 @@ size_t get_mem_allocated(void) { return mem_allocated; }
 
 void mem_summary(FILE *fp, const int verbose) {
 #ifdef _DEBUG
+#ifdef AFL_BUILD
+	int *stuff = NULL;
+#endif
+
 	printf("----- LEAK CHECK SUMMARY\n");
 	printf("%zu allocs, %zu frees. %zu bytes still allocated.\n", n_allocs, n_frees, mem_allocated);
 	printf("Peak memory usage: %zu bytes. Cumulative use: %zu.\n", max_allocated, cum_allocated);
-	if(mem_allocated > 0)
+	if(mem_allocated > 0) {
+		printf("----- Leak details:\n");
 		mt_printlist(fp, verbose);
+		printf("----- End details.\n");
+#ifdef AFL_BUILD
+		/* Intentional crash. */
+		*stuff = 1;
+#endif
+	}
 	printf("----- END SUMMARY\n");
 #endif
 }

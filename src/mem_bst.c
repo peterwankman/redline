@@ -443,6 +443,7 @@ static void peek_leak(FILE *fp, mt_node_t *node) {
 		}
 		printf("|\n");
 	}
+	printf("\n");
 }
 
 static void printlist_rec(FILE *fp, mt_node_t *node, const int verbose) {
