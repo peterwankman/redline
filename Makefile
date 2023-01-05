@@ -8,7 +8,8 @@ AFL_CC=afl-gcc
 CC=$(NATIVE_CC)
 
 CFLAGS_RELEASE=-O2
-CFLAGS_DEBUG=-O0 -ggdb
+CFLAGS_DEBUG=-O0 -ggdb -D_DEBUG -rdynamic
+CFLAGS_VERBOSE=-$(CFLAGS_DEBUG) -D_CHATTY_PARSER
 CFLAGS_AFL=-DAFL_BUILD $(CFLAGS_DEBUG)
 
 CFLAGS=$(CFLAGS_DEBUG)
@@ -20,11 +21,13 @@ $(OBJ)/ermac.o \
 $(OBJ)/getopt.o \
 $(OBJ)/lexer.o \
 $(OBJ)/main.o \
+$(OBJ)/mem.o \
+$(OBJ)/mem_bst.o \
 $(OBJ)/parser.o \
 $(OBJ)/repl.o \
 $(OBJ)/util.o
 
-.PHONY: all, debug, release, clean, $(SRC)/rev.h
+.PHONY: all, debug, release, verbose, clean, $(SRC)/rev.h
 
 release:
 	make $(BIN)/edison-release
@@ -33,6 +36,10 @@ release:
 debug:
 	make $(BIN)/edison-debug
 	mv $(BIN)/edison-debug $(BIN)/edison
+
+verbose:
+	make $(BIN)/edison-verbose
+	mv $(BIN)/edison-verbose $(BIN)/edison
 
 all:
 	make $(BIN)/edison-afl
@@ -58,7 +65,7 @@ $(BIN)/edison-release:
 
 $(BIN)/edison-verbose:
 	rm -f $(OBJ)/*
-	make CFLAGS="$(CFLAGS_DEBUG) -DCHATTY_PARSER" $(BIN)/edison
+	make CFLAGS="$(CFLAGS_VERBOSE)" $(BIN)/edison
 	mv $(BIN)/edison $(BIN)/edison-verbose
 
 $(BIN)/edison: $(PIECES)
