@@ -176,7 +176,7 @@ static edps_instr_t *instr_new(void) {
 /**/
 
 static int ps_set_start_range(edps_instr_t *instr, const int line) {
-#ifdef CHATTY_PARSER
+#ifdef DEBUG_VERBOSE
 	printf("PARSER: ps_set_start_range(%d)\n", line);
 #endif
 
@@ -191,7 +191,7 @@ static int ps_set_start_range(edps_instr_t *instr, const int line) {
 }
 
 static int ps_set_end_range(edps_instr_t *instr, const int line) {
-#ifdef CHATTY_PARSER
+#ifdef DEBUG_VERBOSE
 	printf("PARSER: ps_set_end_range(%d)\n", line);
 #endif
 
@@ -206,7 +206,7 @@ static int ps_set_end_range(edps_instr_t *instr, const int line) {
 }
 
 static int ps_set_only_line(edps_instr_t *instr, const int line) {
-#ifdef CHATTY_PARSER
+#ifdef DEBUG_VERBOSE
 	printf("PARSER: ps_set_only_line(%d)\n", line);
 #endif
 
@@ -223,7 +223,7 @@ static int ps_set_only_line(edps_instr_t *instr, const int line) {
 }
 
 static int ps_set_target(edps_instr_t *instr, const int line) {
-#ifdef CHATTY_PARSER
+#ifdef DEBUG_VERBOSE
 	printf("PARSER: ps_set_target(%d)\n", line);
 #endif
 
@@ -238,7 +238,7 @@ static int ps_set_target(edps_instr_t *instr, const int line) {
 }
 
 static int ps_set_repeat(edps_instr_t *instr, const int n) {
-#ifdef CHATTY_PARSER
+#ifdef DEBUG_VERBOSE
 	printf("PARSER: ps_set_repeat(%d)\n", n);
 #endif
 
@@ -253,7 +253,7 @@ static int ps_set_repeat(edps_instr_t *instr, const int n) {
 }
 
 static int ps_set_command(edps_instr_t *instr, const edps_cmd_t command) {
-#ifdef CHATTY_PARSER
+#ifdef DEBUG_VERBOSE
 	printf("PARSER: ps_set_command(%d)\n", command);
 #endif
 
@@ -266,7 +266,7 @@ static int ps_set_command(edps_instr_t *instr, const edps_cmd_t command) {
 }
 
 static int ps_set_ask(edps_instr_t *instr) {
-#ifdef CHATTY_PARSER
+#ifdef DEBUG_VERBOSE
 	printf("PARSER: ps_set_ask()\n");
 #endif
 
@@ -279,7 +279,7 @@ static int ps_set_ask(edps_instr_t *instr) {
 }
 
 static int ps_set_search(edps_instr_t *instr, const char *search_str) {
-#ifdef CHATTY_PARSER
+#ifdef DEBUG_VERBOSE
 	printf("PARSER: ps_set_search(\"%s\")\n", search_str);
 #endif
 
@@ -300,7 +300,7 @@ static int ps_set_search(edps_instr_t *instr, const char *search_str) {
 }
 
 static int ps_set_replace(edps_instr_t *instr, const char *replace_str) {
-#ifdef CHATTY_PARSER
+#ifdef DEBUG_VERBOSE
 	printf("PARSER: ps_set_replace(\"%s\")\n", replace_str);
 #endif
 
@@ -321,7 +321,7 @@ static int ps_set_replace(edps_instr_t *instr, const char *replace_str) {
 }
 
 static int ps_set_filename(edps_instr_t *instr, const char *filename_str) {
-#ifdef CHATTY_PARSER
+#ifdef DEBUG_VERBOSE
 	printf("PARSER: ps_set_filename(\"%s\")\n", filename_str);
 #endif
 
@@ -348,7 +348,7 @@ static int ps_after_range(edps_ctx_t *ctx) {
 	char lookahead;
 	int status;
 
-#ifdef CHATTY_PARSER
+#ifdef DEBUG_VERBOSE
 	printf("PARSER: ps_after_range()\n");
 #endif
 
@@ -429,7 +429,7 @@ static int ps_after_range(edps_ctx_t *ctx) {
 static int ps_copy(edps_ctx_t *ctx) {
 	int status;
 
-#ifdef CHATTY_PARSER
+#ifdef DEBUG_VERBOSE
 	printf("PARSER: ps_copy()\n");
 #endif
 
@@ -442,7 +442,7 @@ static int ps_copy(edps_ctx_t *ctx) {
 static int ps_move(edps_ctx_t *ctx) {
 	int status;
 
-#ifdef CHATTY_PARSER
+#ifdef DEBUG_VERBOSE
 	printf("PARSER: ps_move()\n");
 #endif
 
@@ -458,7 +458,7 @@ static int ps_range_end(edps_ctx_t *ctx) {
 	int status;
 	int cmd_parsed = 0;
 
-#ifdef CHATTY_PARSER
+#ifdef DEBUG_VERBOSE
 	printf("PARSER: ps_range_end()\n");
 #endif
 
@@ -515,7 +515,7 @@ static int ps_range_start(edps_ctx_t *ctx) {
 	char *lexeme;
 	int status, end_of_range = 0;
 
-#ifdef CHATTY_PARSER
+#ifdef DEBUG_VERBOSE
 	printf("PARSER: ps_range_start()\n");
 #endif
 
@@ -561,7 +561,7 @@ static int ps_repeat(edps_ctx_t *ctx) {
 	char *lexeme;
 	int status;
 
-#ifdef CHATTY_PARSER
+#ifdef DEBUG_VERBOSE
 	printf("PARSER: ps_repeat()\n");
 #endif
 
@@ -578,7 +578,7 @@ static int ps_replace(edps_ctx_t *ctx) {
 	char *lexeme;
 	int status;
 
-#ifdef CHATTY_PARSER
+#ifdef DEBUG_VERBOSE
 	printf("PARSER: ps_replace()\n");
 #endif
 
@@ -653,7 +653,7 @@ static int ps_search(edps_ctx_t *ctx) {
 	char *lexeme, lookahead;
 	int status;
 
-#ifdef CHATTY_PARSER
+#ifdef DEBUG_VERBOSE
 	printf("PARSER: ps_search()\n");
 #endif
 
@@ -693,7 +693,7 @@ static int ps_standalone_cmd(edps_ctx_t *ctx) {
 	edlx_token_t token;
 	int status;
 
-#ifdef CHATTY_PARSER
+#ifdef DEBUG_VERBOSE
 	printf("PARSER: ps_standalone_cmd()\n");
 #endif
 
@@ -724,7 +724,7 @@ static int ps_statement(edps_ctx_t *ctx) {
 	char lookahead;
 	int status;
 
-#ifdef CHATTY_PARSER
+#ifdef DEBUG_VERBOSE
 	printf("PARSER: ps_statement()\n");
 #endif
 
@@ -816,7 +816,7 @@ static int ps_target(edps_ctx_t *ctx) {
 	char *lexeme;
 	int status;
 
-#ifdef CHATTY_PARSER
+#ifdef DEBUG_VERBOSE
 	printf("PARSER: ps_target()\n");
 #endif
 
@@ -873,7 +873,7 @@ static int ps_transfer(edps_ctx_t *ctx) {
 	char *lexeme;
 	int status;
 
-#ifdef CHATTY_PARSER
+#ifdef DEBUG_VERBOSE
 	printf("PARSER: ps_transfer()\n");
 #endif
 
@@ -888,7 +888,7 @@ static int ps_write(edps_ctx_t *ctx) {
 	char lookahead, *lexeme;
 	int status;
 
-#ifdef CHATTY_PARSER
+#ifdef DEBUG_VERBOSE
 	printf("PARSER: ps_write()\n");
 #endif
 
@@ -933,7 +933,7 @@ int edps_parse(edps_ctx_t *ctx) {
 			edlx_print_error(ctx->edlx_ctx, "Syntax error.", ctx->n_subexpr, ctx->prompt);
 		return status;
 	}
-#ifdef CHATTY_PARSER
+#ifdef DEBUG_VERBOSE
 	print_instr(ctx->instr);
 #endif
 	if((status = edlx_step(ctx->edlx_ctx)) != RET_OK)

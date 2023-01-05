@@ -165,7 +165,7 @@ static int classify_range(const edps_instr_t *instr) {
 }
 
 static int resolve_lines(repl_state_t *state, edps_instr_t *instr) {
-#ifdef CHATTY_PARSER
+#ifdef DEBUG_VERBOSE
 	uint8_t n_subs = 0;
 	const uint8_t sub_only = 0x01;
 	const uint8_t sub_start = 0x02;
@@ -175,33 +175,33 @@ static int resolve_lines(repl_state_t *state, edps_instr_t *instr) {
 #endif
 	if(instr->only_line == EDPS_THIS_LINE) {
 		instr->only_line = state->cursor;
-#ifdef CHATTY_PARSER
+#ifdef DEBUG_VERBOSE
 		n_subs |= sub_only;
 #endif
 	}
 
 	if(instr->start_line == EDPS_THIS_LINE) {
 		instr->start_line = state->cursor;
-#ifdef CHATTY_PARSER
+#ifdef DEBUG_VERBOSE
 		n_subs |= sub_start;
 #endif
 	}
 
 	if(instr->end_line == EDPS_THIS_LINE) {
 		instr->end_line = state->cursor;
-#ifdef CHATTY_PARSER
+#ifdef DEBUG_VERBOSE
 		n_subs |= sub_end;
 #endif
 	}
 
 	if(instr->target_line == EDPS_THIS_LINE) {
 		instr->target_line = state->cursor;
-#ifdef CHATTY_PARSER
+#ifdef DEBUG_VERBOSE
 		n_subs |= sub_target;
 #endif
 	}
 
-#ifdef CHATTY_PARSER
+#ifdef DEBUG_VERBOSE
 	printf("Resolver:");
 	if(n_subs > 0) {
 		if(n_subs & sub_only)

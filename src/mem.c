@@ -54,10 +54,12 @@ void mem_free(void *ptr) {
 void *mem_alloc(const size_t n, const char *file, const int line) {
 	void *new;
 
+#ifdef DEBUG_VERBOSE
 	if(n == 0) {
 		fprintf(stderr, "Warning: Tried to allocate 0 bytes\n");
 		fprintf(stderr, " in file %s, line %d.\n", file, line);
 	}
+#endif
 
 	if((new = malloc(n + CANARY_SIZE)) == NULL)
 		return NULL;
@@ -119,9 +121,11 @@ size_t get_mem_allocated(void) { return mem_allocated; }
 
 void mem_summary(FILE *fp, const int verbose) {
 #ifdef _DEBUG
+	printf("----- LEAK CHECK SUMMARY\n");
 	printf("%zu allocs, %zu frees. %zu bytes still allocated.\n", n_allocs, n_frees, mem_allocated);
 	printf("Peak memory usage: %zu bytes. Cumulative use: %zu.\n", max_allocated, cum_allocated);
 	if(mem_allocated > 0)
 		mt_printlist(fp, verbose);
+	printf("----- END SUMMARY\n");
 #endif
 }
