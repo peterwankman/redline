@@ -150,6 +150,11 @@ static void edps_instr_free(edps_instr_t *instr) {
 }
 
 static void instr_reset(edps_instr_t *instr) {
+	if(instr->search_str != NULL)
+		free(instr->search_str);
+	if(instr->replace_str != NULL)
+		free(instr->replace_str);
+
 	instr->start_line = EDPS_NO_LINE;
 	instr->end_line = EDPS_NO_LINE;
 	instr->only_line = EDPS_NO_LINE;
