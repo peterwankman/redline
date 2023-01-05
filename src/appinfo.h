@@ -9,7 +9,7 @@
 #define APP_NAME	"edsel"
 
 #define APP_VER_MAJOR	1
-#define APP_VER_MINOR	0
+#define APP_VER_MINOR	1
 
 #include "rev.h"
 
