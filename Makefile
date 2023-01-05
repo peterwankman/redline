@@ -27,7 +27,7 @@ $(OBJ)/parser.o \
 $(OBJ)/repl.o \
 $(OBJ)/util.o
 
-.PHONY: all, debug, release, verbose, clean, $(SRC)/rev.h
+.PHONY: all, afl, debug, release, verbose, clean, $(SRC)/rev.h
 
 release:
 	make $(BIN)/edison-release
@@ -40,6 +40,10 @@ debug:
 verbose:
 	make $(BIN)/edison-verbose
 	mv $(BIN)/edison-verbose $(BIN)/edison
+
+afl:
+	make $(BIN)/edison-afl
+	cp $(BIN)/edison-afl $(BIN)/edison
 
 all:
 	make $(BIN)/edison-afl
