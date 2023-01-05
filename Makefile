@@ -31,15 +31,15 @@ $(OBJ)/util.o
 
 release:
 	make $(BIN)/edison-release
-	mv $(BIN)/edison-release $(BIN)/edison
+	cp $(BIN)/edison-release $(BIN)/edison
 
 debug:
 	make $(BIN)/edison-debug
-	mv $(BIN)/edison-debug $(BIN)/edison
+	cp $(BIN)/edison-debug $(BIN)/edison
 
 verbose:
 	make $(BIN)/edison-verbose
-	mv $(BIN)/edison-verbose $(BIN)/edison
+	cp $(BIN)/edison-verbose $(BIN)/edison
 
 afl:
 	make $(BIN)/edison-afl
