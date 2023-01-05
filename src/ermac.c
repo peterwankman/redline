@@ -48,6 +48,7 @@ char *str_error(const int err_no) {
 		case RET_ERR_NOTFOUND:	return str_alloc_copy("Not found");
 		case RET_ERR_INVALID:	return str_alloc_copy("Invalid input");
 		case RET_ERR_RANGE:		return str_alloc_copy("Invalid range");
+		case RET_ERR_OVERFLOW:	return str_alloc_copy("Numeric overflow");
 		case RET_ERR_OPEN:		return str_alloc_copy("Open failed");
 		case RET_ERR_READ:		return str_alloc_copy("Read error");
 		case RET_ERR_WRITE:		return str_alloc_copy("Write error");

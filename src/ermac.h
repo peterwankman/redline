@@ -18,10 +18,11 @@
 #define RET_ERR_NOTFOUND		-5
 #define RET_ERR_INVALID			-6
 #define RET_ERR_RANGE			-7
-#define RET_ERR_OPEN			-8
-#define RET_ERR_READ			-9
-#define RET_ERR_WRITE			-10
-#define RET_ERR_NOWRITE			-11
+#define RET_ERR_OVERFLOW		-8
+#define RET_ERR_OPEN			-9
+#define RET_ERR_READ			-10
+#define RET_ERR_WRITE			-11
+#define RET_ERR_NOWRITE			-12
 
 #define RET_ERR_LEXER			-100
 /* Room for specific lexer errors. */

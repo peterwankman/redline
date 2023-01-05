@@ -142,6 +142,49 @@ int is_positive_integer(const char *str) {
 	return 1;
 }
 
+int is_good_integer(const char *str) {
+	int notzero = 0;
+	size_t len, pos = 0, cmp = 0, i;
+	const char min_int[] = "2147483648";
+	const char max_int[] = "2147483647";
+	const char *limit;
+
+	if(str == NULL) return RET_NO;
+	if((len = strlen(str)) == 0) return RET_NO;
+
+	if(str[0] == '-') {
+		/* Only a minus sign? I don't think so! */
+		if(len == 1) return RET_NO;
+
+		limit = min_int;
+		pos++;
+	} else {
+		limit = max_int;
+	}
+
+	/* All digits? */
+	for(i = pos; i < len; i++) {
+		if(!isxdigit(str[i])) return RET_NO;
+		/* Skip leading zeroes, although I think it'd just be abuse. */
+		if(str[i] == '0') {
+			if(notzero == 0) {
+				pos++;
+			}
+		} else {
+			notzero = 1;
+		}
+	}
+	/* Numbers with less than 10 digits are good. */
+	if(len - pos < 10) return RET_YES;
+
+	for(i = pos; i < len; i++) {
+		if(str[i] > limit[cmp++])
+			return RET_NO;
+	}
+
+	return RET_YES;
+}
+
 uint32_t num_len(int i) {
 	uint32_t out = 0;
 	while(i) {

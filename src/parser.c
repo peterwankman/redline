@@ -484,6 +484,10 @@ static int ps_range_end(edps_ctx_t *ctx) {
 			break;
 
 		case EDLX_TOKEN_NUMBER:
+			if(is_good_integer(lexeme) == RET_NO) {
+				status = RET_ERR_OVERFLOW;
+				break;
+			}
 			status = ps_set_end_range(ctx->instr, atoi(lexeme));
 			break;
 
@@ -544,6 +548,10 @@ static int ps_range_start(edps_ctx_t *ctx) {
 			break;
 
 		case EDLX_TOKEN_NUMBER:
+			if(is_good_integer(lexeme) == RET_NO) {
+				status = RET_ERR_OVERFLOW;
+				break;
+			}
 			if(end_of_range == 0)
 				status = ps_set_start_range(ctx->instr, atoi(lexeme));
 			else
@@ -574,7 +582,11 @@ static int ps_repeat(edps_ctx_t *ctx) {
 	if((status = edlx_get_required_token(ctx->edlx_ctx, EDLX_TOKEN_NUMBER)) != RET_OK)
 		return status;
 	lexeme = edlx_get_lexeme(ctx->edlx_ctx);
-	status = ps_set_repeat(ctx->instr, atoi(lexeme));
+	if(is_good_integer(lexeme) == RET_NO)
+		return RET_ERR_OVERFLOW;
+
+	if((status = ps_set_repeat(ctx->instr, atoi(lexeme))) != RET_OK)
+		return status;
 
 	return ps_copy(ctx);
 }
@@ -839,6 +851,10 @@ static int ps_target(edps_ctx_t *ctx) {
 			break;
 
 		case EDLX_TOKEN_NUMBER:
+			if(is_good_integer(lexeme) == RET_NO) {
+				status = RET_ERR_OVERFLOW;
+				break;
+			}
 			status = ps_set_target(ctx->instr, atoi(lexeme));
 			break;
 

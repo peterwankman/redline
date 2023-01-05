@@ -16,6 +16,7 @@ char *str_alloc_copy(const char *str);
 
 int is_integer(const char *str);
 int is_positive_integer(const char *str);
+int is_good_integer(const char *str);
 uint32_t num_len(int i);
 
 int is_piped(FILE *fp);
