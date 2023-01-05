@@ -17,6 +17,7 @@
 
 #include "mem.h"
 
+#include "appinfo.h"
 #include "ermac.h"
 
 #define MAXBUF		1024
@@ -108,7 +109,7 @@ char *str_alloc_copy(const char *str) {
 	str_size = strlen(str) + 1;
 
 	if((out = malloc(str_size)) == NULL) {
-		fprintf(stderr, "edlin: String allocation failed.\n");
+		fprintf(stderr, "%s: String allocation failed.\n", APP_NAME);
 		return NULL;
 	}
 

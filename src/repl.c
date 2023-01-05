@@ -10,6 +10,7 @@
 
 #include "mem.h"
 
+#include "appinfo.h"
 #include "ermac.h"
 #include "lexer.h"
 #include "parser.h"
@@ -258,8 +259,10 @@ static int append(repl_state_t *state, ed_doc_t *document, edps_instr_t *instr) 
 	do {
 		entered_line = text_prompt(curr_line, state->cursor_marker);
 
-		if(is_empty(entered_line) == RET_YES)
+		if(is_empty(entered_line) == RET_YES) {
+			free(entered_line);
 			break;
+		}
 
 		if((status = dynarr_append(document->lines_arr, &entered_line)) != RET_OK) {
 			free(entered_line);
@@ -742,7 +745,7 @@ static int replace(repl_state_t *state, ed_doc_t *document, edps_instr_t *instr)
 		/* Nothing searched before.        */
 		/* Empty search string is invalid. */
 		if((instr->search_str == NULL) || (instr->search_str[0] == '\0')) {
-			fprintf(stderr, "edlin: Not found.\n");
+			fprintf(stderr, "%s: Not found.\n", APP_NAME);
 			return RET_ERR_SYNTAX;
 		}
 		if((state->search_str = str_alloc_copy(instr->search_str)) == NULL)
@@ -791,7 +794,7 @@ static int replace(repl_state_t *state, ed_doc_t *document, edps_instr_t *instr)
 	}
 
 	if(found == 0)
-		fprintf(stderr, "edlin: Not found.\n");
+		fprintf(stderr, "%s: Not found.\n", APP_NAME);
 
 	return RET_ERR_NOTFOUND;
 }
@@ -819,7 +822,7 @@ static int search(repl_state_t *state, ed_doc_t *document, edps_instr_t *instr) 
 		/* Nothing searched before.        */
 		/* Empty search string is invalid. */
 		if((instr->search_str == NULL) || (instr->search_str[0] == '\0')) {
-			fprintf(stderr, "edlin: Not found.\n");
+			fprintf(stderr, "%s: Not found.\n", APP_NAME);
 			return RET_ERR_SYNTAX;
 		}
 		if((state->search_str = str_alloc_copy(instr->search_str)) == NULL)
@@ -857,7 +860,7 @@ static int search(repl_state_t *state, ed_doc_t *document, edps_instr_t *instr) 
 		}
 	}
 
-	fprintf(stderr, "edlin: Not found.\n");
+	fprintf(stderr, "%s: Not found.\n", APP_NAME);
 
 	return RET_ERR_NOTFOUND;
 }
@@ -1093,7 +1096,7 @@ static repl_state_t *repl_init(const char *prompt, const char *cursor_marker) {
 	repl_state_t *out;
 
 	if((out = malloc(sizeof(repl_state_t))) == NULL) {
-		fprintf(stderr, "edlin: Failed to set up the editor.\n");
+		fprintf(stderr, "%s: Failed to set up the editor.\n", APP_NAME);
 		return NULL;
 	}
 
@@ -1145,7 +1148,7 @@ int repl_main(FILE *input, ed_doc_t *ed_doc, const char *prompt, const char *cur
 			printf("%s\n", cmdline);
 
 		if((parser_ctx = edps_new(cmdline, prompt, &status)) == NULL) {
-			fprintf(stderr, "edlin: Parser initialization failed.\n");
+			fprintf(stderr, "%s: Parser initialization failed.\n", APP_NAME);
 			continue;
 		}
 
@@ -1164,7 +1167,7 @@ int repl_main(FILE *input, ed_doc_t *ed_doc, const char *prompt, const char *cur
 			}
 
 			if((instruction = edps_get_instr(parser_ctx)) == NULL) {
-				fprintf(stderr, "edlin: Couldn't fetch the instruction.\n");
+				fprintf(stderr, "%s: Couldn't fetch the instruction.\n", APP_NAME);
 				return status;
 			}
 

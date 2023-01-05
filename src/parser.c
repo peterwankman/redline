@@ -9,6 +9,7 @@
 
 #include "mem.h"
 
+#include "appinfo.h"
 #include "ermac.h"
 #include "lexer.h"
 #include "parser.h"
@@ -171,7 +172,7 @@ static edps_instr_t *instr_new(void) {
 	edps_instr_t *instr;
 
 	if((instr = malloc(sizeof(edps_instr_t))) == NULL) {
-		fprintf(stderr, "edlin: Failed to set up an instruction context.\n");
+		fprintf(stderr, "%s: Failed to set up an instruction context.\n", APP_NAME);
 	}
 
 	instr_reset(instr);
@@ -969,12 +970,12 @@ edps_ctx_t *edps_new(const char *cmdline, const char *prompt, int *status) {
 
 	*status = RET_ERR_MALLOC;
 	if((ctx = malloc(sizeof(edps_ctx_t))) == NULL) {
-		fprintf(stderr, "edlin: Failed to set up a parser context.\n");
+		fprintf(stderr, "%s: Failed to set up a parser context.\n", APP_NAME);
 		return NULL;
 	}
 
 	if((ctx->edlx_ctx = edlx_ctx_new(cmdline, status)) == NULL) {
-		fprintf(stderr, "edlin: Failed to set up a lexer context.\n");
+		fprintf(stderr, "%s: Failed to set up a lexer context.\n", APP_NAME);
 		free(ctx);
 		return NULL;
 	}

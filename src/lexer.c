@@ -11,6 +11,7 @@
 
 #include "mem.h"
 
+#include "appinfo.h"
 #include "ermac.h"
 #include "lexer.h"
 #include "util.h"
@@ -233,12 +234,12 @@ static void prepare_ctx(edlx_ctx_t *ctx) {
 
 	/* Save current state to enable rewinding. */
 	if((ctx->last_state = malloc(sizeof(edlx_ctx_t))) == NULL) {
-		fprintf(stderr, "edlin: Couldn't save lexer state.\n");
+		fprintf(stderr, "%s: Couldn't save lexer state.\n", APP_NAME);
 	} else {
 		last_state = ctx->last_state;
 
 		if((last_state->curr_lexeme = malloc(ctx->curr_lexeme_alloced)) == NULL) {
-			fprintf(stderr, "edlin: Couldn't save previous lexeme.\n");
+			fprintf(stderr, "%s: Couldn't save previous lexeme.\n", APP_NAME);
 			goto copy_failed;
 		}
 
@@ -447,7 +448,7 @@ int edlx_rewind(edlx_ctx_t *ctx) {
 
 	if(ctx == NULL) return RET_ERR_NULLPO;
 	if(ctx->last_state == NULL) {
-		fprintf(stderr, "edlin: Couldn't rewind lexer state. No previous state saved.\n");
+		fprintf(stderr, "%s: Couldn't rewind lexer state. No previous state saved.\n", APP_NAME);
 		return RET_ERR_NULLPO;
 	}
 
@@ -455,7 +456,7 @@ int edlx_rewind(edlx_ctx_t *ctx) {
 	free(ctx->curr_lexeme);
 
 	if((ctx->curr_lexeme = malloc(last_state->curr_lexeme_alloced)) == NULL) {
-		fprintf(stderr, "edlin: Couldn't rewind lexer state. Couldn't allocate lexeme.\n");
+		fprintf(stderr, "%s: Couldn't rewind lexer state. Couldn't allocate lexeme.\n", APP_NAME);
 		return RET_ERR_MALLOC;
 	}
 	memcpy(ctx->curr_lexeme, last_state->curr_lexeme, last_state->curr_lexeme_size);
