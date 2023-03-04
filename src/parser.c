@@ -177,6 +177,10 @@ static edps_instr_t *instr_new(void) {
 		fprintf(stderr, "%s: Failed to set up an instruction context.\n", APP_NAME);
 	}
 
+	instr->search_str = NULL;
+	instr->replace_str = NULL;
+	instr->filename = NULL;
+
 	instr_reset(instr);
 	return instr;
 }
